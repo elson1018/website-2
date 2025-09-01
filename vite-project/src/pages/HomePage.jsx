@@ -1,25 +1,16 @@
-import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Hero from "../components/Hero";
+import Features from "../components/Features";
+import Footer from "../components/Footer";
 import "./HomePage.css";
 
 export default function HomePage() {
   return (
-    <div>
-      <nav className="navbar">
-        <div className="logo">MyApp</div>
-
-        <div className="search-container">
-          <input type="text" className="search-bar" placeholder="Search..." />
-        </div>
-
-        <div className="nav-buttons">
-          <Link to="/login" className="login-btn">Login</Link>
-          <Link to="/signup" className="signup-btn">Sign Up</Link>
-        </div>
-      </nav>
-
-      <main className="content">
-        <h1>Welcome to MyApp 🎉</h1>
-      </main>
+    <div className="homepage">
+      <Navbar />
+      <Hero />
+      <Features />
+      <Footer />
     </div>
   );
 }
