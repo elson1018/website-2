@@ -87,7 +87,7 @@ export default function SignupPage() {
       
       // For demo purposes, just redirect to home
       // In a real app, you'd handle account creation here
-      navigate("/");
+      navigate("/check-in");
     } catch (error) {
       console.error("Signup failed:", error);
     } finally {

@@ -22,7 +22,7 @@ export default function Hero() {
     <div className="hero">
       <div className="hero-content">
         <h1 className="hero-title">
-          Welcome to <span className="highlight">MyApp</span>
+          Welcome to <span className="highlight">NaiNaiLong</span>
         </h1>
         <p className="hero-subtitle">
           {texts[currentText]}

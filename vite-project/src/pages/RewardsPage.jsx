@@ -1,9 +1,11 @@
 import { useCoins } from "../context/CoinContext.jsx";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./RewardsPage.css";
 
 export default function RewardsPage() {
   const { role, setRole, studentCoins, tutorCoins, spendStudentCoins, spendTutorCoins, simulateStudentAction, simulateTutorAction } = useCoins();
+  const navigate = useNavigate();
   const [lastAction, setLastAction] = useState("");
   const [history, setHistory] = useState([]);
 
@@ -20,6 +22,15 @@ export default function RewardsPage() {
     const next = [entry, ...history].slice(0, 6);
     setHistory(next);
     try { localStorage.setItem("action-history", JSON.stringify(next)); } catch {}
+  };
+
+  const requireAuth = (onAuthed) => {
+    try {
+      const raw = localStorage.getItem("auth-user");
+      if (raw) return onAuthed();
+    } catch {}
+    alert("Please log in to perform this action.");
+    navigate("/login");
   };
 
   return (
@@ -42,19 +53,18 @@ export default function RewardsPage() {
         <h2>Earning Actions</h2>
         {role === "student" ? (
           <div className="actions-row">
-            <button className="btn primary" onClick={() => { simulateStudentAction("attend_session"); recordAction("Attended a tutoring session"); }}>Attend a tutoring session</button>
-            <button className="btn" onClick={() => { simulateStudentAction("complete_assignment"); recordAction("Completed an assignment/quiz"); }}>Complete assignment/quiz</button>
-            <button className="btn" onClick={() => { simulateStudentAction("give_feedback"); recordAction("Gave useful feedback to tutor"); }}>Give useful feedback</button>
-            <button className="btn" onClick={() => { simulateStudentAction("daily_login"); recordAction("Daily login"); }}>Daily login</button>
-            <button className="btn" onClick={() => { simulateStudentAction("weekly_streak_completed"); recordAction("Weekly attendance streak completed"); }}>Weekly attendance streak</button>
+            <button className="btn primary" onClick={() => requireAuth(() => { navigate("/dashboard#tutors"); recordAction("Navigate to Find Your Tutor"); })}>Attend a tutoring session</button>
+            <button className="btn" onClick={() => requireAuth(() => { navigate("/assignments"); recordAction("Navigate to Assignments"); })}>Complete assignment/quiz</button>
+            <button className="btn" onClick={() => requireAuth(() => { navigate("/feedback"); recordAction("Navigate to Feedback"); })}>Give useful feedback</button>
+            <button className="btn" onClick={() => requireAuth(() => { navigate("/check-in"); recordAction("Navigate to Check-in"); })}>Daily login</button>
           </div>
         ) : (
           <div className="actions-row">
-            <button className="btn primary" onClick={() => { simulateTutorAction("conduct_session"); recordAction("Conducted a tutoring session"); }}>Conduct a tutoring session</button>
-            <button className="btn" onClick={() => { simulateTutorAction("positive_rating"); recordAction("Received a positive rating"); }}>Receive positive rating</button>
-            <button className="btn" onClick={() => { simulateTutorAction("consistency_bonus"); recordAction("Consistency bonus achieved"); }}>Consistency bonus</button>
-            <button className="btn" onClick={() => { simulateTutorAction("upload_material"); recordAction("Uploaded extra study materials"); }}>Upload extra materials</button>
-            <button className="btn" onClick={() => { simulateTutorAction("student_engagement"); recordAction("Student engagement bonus"); }}>Student engagement bonus</button>
+            <button className="btn primary" onClick={() => requireAuth(() => { simulateTutorAction("conduct_session"); recordAction("Conducted a tutoring session"); })}>Conduct a tutoring session</button>
+            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("positive_rating"); recordAction("Received a positive rating"); })}>Receive positive rating</button>
+            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("consistency_bonus"); recordAction("Consistency bonus achieved"); })}>Consistency bonus</button>
+            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("upload_material"); recordAction("Uploaded extra study materials"); })}>Upload extra materials</button>
+            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("student_engagement"); recordAction("Student engagement bonus"); })}>Student engagement bonus</button>
           </div>
         )}
       </section>

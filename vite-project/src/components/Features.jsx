@@ -34,7 +34,7 @@ export default function Features() {
   return (
     <section className="features">
       <div className="features-header">
-        <h2>Why Choose MyApp?</h2>
+        <h2>Why Choose NaiNaiLong?</h2>
         <p>Discover what makes us different</p>
       </div>
       

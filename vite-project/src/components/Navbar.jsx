@@ -8,6 +8,7 @@ export default function Navbar() {
   const [authUser, setAuthUser] = useState(null);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const menuRef = useRef(null);
   const location = useLocation();
 
@@ -58,11 +59,13 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="logo">
-        <Link to="/">NaiNaiLong</Link>
+        <Link to="/">NaiNaILong</Link>
       </div>
 
       <div className="search-container">
-        <input type="text" className="search-bar" placeholder="Search..." />
+        <form onSubmit={(e) => { e.preventDefault(); navigate(`/dashboard?q=${encodeURIComponent(query)}#tutors`); }}>
+          <input type="text" className="search-bar" placeholder="Search subject or tutor..." value={query} onChange={(e) => setQuery(e.target.value)} />
+        </form>
       </div>
 
       <div className="nav-buttons">

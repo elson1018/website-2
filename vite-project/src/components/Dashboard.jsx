@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useCoins } from "../context/CoinContext.jsx";
 import "./Dashboard.css";
 
@@ -21,6 +22,7 @@ export default function Dashboard() {
   ]);
   const [selectedTutor, setSelectedTutor] = useState(null);
   const [selectedAction, setSelectedAction] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     // Simulate loading data
@@ -44,6 +46,13 @@ export default function Dashboard() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (location.hash === "#tutors") {
+      const el = document.getElementById("tutors");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location]);
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -118,10 +127,17 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-content">
-        <div className="tutors-panel">
+        <div id="tutors" className="tutors-panel">
           <h3>Find Your Tutor</h3>
           <div className="tutor-grid">
-            {tutors.map(t => (
+            {tutors
+              .filter((t) => {
+                const params = new URLSearchParams(window.location.search);
+                const q = (params.get("q") || "").toLowerCase();
+                if (!q) return true;
+                return t.subject.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
+              })
+              .map(t => (
               <div key={t.id} className="tutor-card">
                 <div className="tutor-header">
                   <div className="avatar" aria-hidden>👩‍🏫</div>
@@ -168,19 +184,54 @@ export default function Dashboard() {
           <h3 style={{ marginTop: 24 }}>Earning Actions</h3>
           {role === "student" ? (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="action-btn primary" onClick={() => simulateStudentAction("attend_session")}>Attend a tutoring session</button>
-              <button className="action-btn secondary" onClick={() => simulateStudentAction("complete_assignment")}>Complete assignment/quiz</button>
-              <button className="action-btn secondary" onClick={() => simulateStudentAction("give_feedback")}>Give useful feedback</button>
-              <button className="action-btn secondary" onClick={() => simulateStudentAction("daily_login")}>Daily login</button>
-              <button className="action-btn secondary" onClick={() => simulateStudentAction("weekly_streak_completed")}>Weekly attendance streak</button>
+              <button className="action-btn primary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateStudentAction("attend_session");
+              }}>Attend a tutoring session</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateStudentAction("complete_assignment");
+              }}>Complete assignment/quiz</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateStudentAction("give_feedback");
+              }}>Give useful feedback</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateStudentAction("daily_login");
+              }}>Daily login</button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="action-btn primary" onClick={() => simulateTutorAction("conduct_session")}>Conduct a tutoring session</button>
-              <button className="action-btn secondary" onClick={() => simulateTutorAction("positive_rating")}>Receive positive rating</button>
-              <button className="action-btn secondary" onClick={() => simulateTutorAction("consistency_bonus")}>Consistency bonus</button>
-              <button className="action-btn secondary" onClick={() => simulateTutorAction("upload_material")}>Upload extra materials</button>
-              <button className="action-btn secondary" onClick={() => simulateTutorAction("student_engagement")}>Student engagement bonus</button>
+              <button className="action-btn primary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateTutorAction("conduct_session");
+              }}>Conduct a tutoring session</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateTutorAction("positive_rating");
+              }}>Receive positive rating</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateTutorAction("consistency_bonus");
+              }}>Consistency bonus</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateTutorAction("upload_material");
+              }}>Upload extra materials</button>
+              <button className="action-btn secondary" onClick={() => {
+                const raw = localStorage.getItem("auth-user");
+                if (!raw) { alert("Please log in to perform this action."); return; }
+                simulateTutorAction("student_engagement");
+              }}>Student engagement bonus</button>
             </div>
           )}
           {role === "student" ? (
