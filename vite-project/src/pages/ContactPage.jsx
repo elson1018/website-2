@@ -54,7 +54,7 @@ export default function ContactPage() {
               <div className="info-icon">📍</div>
               <div>
                 <h3>Address</h3>
-                <p>123 Innovation Street<br />Tech City, TC 12345<br />United States</p>
+                <p>Desasiswa Restu M01<br />Jalan Universiti, 11700 Gelugor<br />Pulau Pinang</p>
               </div>
             </div>
             
@@ -62,8 +62,8 @@ export default function ContactPage() {
               <div className="info-icon">📧</div>
               <div>
                 <h3>Email</h3>
-                <p>hello@myapp.com</p>
-                <p>support@myapp.com</p>
+                <p>nainailong@gmail.com</p>
+                <p>support@nainailong.com</p>
               </div>
             </div>
             
@@ -71,8 +71,8 @@ export default function ContactPage() {
               <div className="info-icon">📞</div>
               <div>
                 <h3>Phone</h3>
-                <p>+1 (555) 123-4567</p>
-                <p>Mon-Fri 9AM-6PM EST</p>
+                <p>+6012-345 6789</p>
+                <p>Mon - Fri 9AM - 6PM</p>
               </div>
             </div>
           </div>

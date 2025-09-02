@@ -5,26 +5,26 @@ import "./AboutPage.css";
 export default function AboutPage() {
   const teamMembers = [
     {
-      name: "Sarah Johnson",
+      name: "Tan Chin Qian",
       role: "CEO & Founder",
       avatar: "👩‍💼",
       bio: "Passionate about creating innovative solutions that make a difference."
     },
     {
-      name: "Mike Chen",
-      role: "CTO",
+      name: "Elson Ooi",
+      role: "Founder",
       avatar: "👨‍💻",
       bio: "Technology enthusiast with 10+ years of experience in software development."
     },
     {
-      name: "Emily Rodriguez",
-      role: "Head of Design",
+      name: "Goo Yong Shen",
+      role: "超强男人",
       avatar: "👩‍🎨",
       bio: "Creative designer focused on user experience and beautiful interfaces."
     },
     {
-      name: "David Kim",
-      role: "Lead Developer",
+      name: "Chong Han Zhneg",
+      role: "Head of Design",
       avatar: "👨‍🔧",
       bio: "Full-stack developer who loves building scalable applications."
     }
@@ -36,7 +36,7 @@ export default function AboutPage() {
       
       <main className="about-content">
         <section className="about-hero">
-          <h1>About MyApp</h1>
+          <h1>About NaiNaiLong</h1>
           <p>We're on a mission to make technology accessible to everyone</p>
         </section>
 
@@ -44,7 +44,7 @@ export default function AboutPage() {
           <div className="story-content">
             <h2>Our Story</h2>
             <p>
-              Founded in 2024, MyApp started as a simple idea: what if we could create 
+              Founded in 2025, NaiNaiLong started as a simple idea: what if we could create 
               an application that truly understands what users need? Our journey began 
               with a small team of passionate developers and designers who believed that 
               great software should be both powerful and easy to use.

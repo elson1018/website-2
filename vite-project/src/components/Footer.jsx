@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>MyApp</h3>
+          <h3>NaiNaiLong</h3>
           <p>Building the future, one app at a time. Join us on this amazing journey.</p>
           <div className="social-links">
             <a href="#" className="social-link">📘</a>
@@ -51,7 +51,7 @@ export default function Footer() {
       
       <div className="footer-bottom">
         <div className="footer-bottom-content">
-          <p>&copy; {currentYear} MyApp. All rights reserved.</p>
+          <p>&copy; {currentYear} NaiNaiLong. All rights reserved.</p>
           <div className="footer-bottom-links">
             <Link to="/terms">Terms</Link>
             <Link to="/privacy">Privacy</Link>

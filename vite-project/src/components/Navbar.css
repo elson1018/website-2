@@ -97,6 +97,71 @@
   background: #1e4fcf;
 }
 
+.nav-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+}
+
+.avatar-pill {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+}
+
+.profile-meta { line-height: 1.1; }
+.profile-name { font-size: 0.9rem; color: #0f172a; font-weight: 700; }
+.profile-role { font-size: 0.75rem; color: #475569; }
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+}
+
+.profile-menu { position: relative; }
+.profile-trigger { background: transparent; border: none; display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; }
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  min-width: 200px;
+  padding: 0.5rem;
+  z-index: 20;
+}
+
+.menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #0f172a;
+  text-decoration: none;
+  display: block;
+}
+
+.menu-item:hover { background: #f1f5f9; }
+.menu-item.danger { color: #ef4444; }
+.menu-sep { height: 1px; background: #e5e7eb; margin: 0.25rem 0; }
+
 @media (max-width: 768px) {
   .navbar {
     padding: 0.8rem 1rem;

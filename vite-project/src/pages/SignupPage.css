@@ -45,7 +45,44 @@
   font-size: 0.9rem;
 }
 
-.form-group input {
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.role-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-btn:hover {
+  border-color: #db2777;
+  box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1);
+}
+
+.role-btn.active {
+  background: #db2777;
+  color: #fff;
+  border-color: #db2777;
+}
+
+.role-icon {
+  font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 0.8rem;
   border: 1px solid #d1d5db;
@@ -55,14 +92,24 @@
   box-sizing: border-box;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   border-color: #db2777;
   box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.1);
   outline: none;
 }
 
-.form-group input.error {
+.form-group input.error,
+.form-group select.error {
   border-color: #ef4444;
+}
+
+/* Role select specific tweaks */
+#role {
+  appearance: none;
+  background: #fff url('data:image/svg+xml;utf8,<svg fill="%236b7280" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 12l-4-4h8l-4 4z"/></svg>') no-repeat right 12px center;
+  background-size: 14px 14px;
+  padding-right: 2rem;
 }
 
 .error-message {

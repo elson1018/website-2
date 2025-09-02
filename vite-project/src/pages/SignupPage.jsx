@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./SignupPage.css";
+import { useCoins } from "../context/CoinContext.jsx";
 
 export default function SignupPage() {
+  const { setRole, addStudentCoins, addTutorCoins } = useCoins();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false
+    agreeToTerms: false,
+    role: "student"
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +27,11 @@ export default function SignupPage() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
+  };
+
+  const selectRole = (role) => {
+    setFormData(prev => ({ ...prev, role }));
+    if (errors.role) setErrors(prev => ({ ...prev, role: "" }));
   };
 
   const validateForm = () => {
@@ -53,6 +61,10 @@ export default function SignupPage() {
       newErrors.confirmPassword = "Passwords do not match";
     }
     
+    if (!formData.role) {
+      newErrors.role = "Please choose a role";
+    }
+    
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "You must agree to the terms and conditions";
     }
@@ -71,12 +83,35 @@ export default function SignupPage() {
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
+      setRole(formData.role);
       
       // For demo purposes, just redirect to home
       // In a real app, you'd handle account creation here
       navigate("/");
     } catch (error) {
       console.error("Signup failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createDemoAccount = async (demoRole = "student") => {
+    try {
+      setIsLoading(true);
+      const demoUser = {
+        fullName: demoRole === "student" ? "Demo Student" : "Demo Tutor",
+        email: demoRole === "student" ? "student.demo@example.com" : "tutor.demo@example.com",
+        role: demoRole
+      };
+      localStorage.setItem("auth-user", JSON.stringify(demoUser));
+      setRole(demoRole);
+      if (demoRole === "student") {
+        addStudentCoins(120);
+      } else {
+        addTutorCoins(220);
+      }
+      await new Promise(resolve => setTimeout(resolve, 600));
+      navigate("/dashboard");
     } finally {
       setIsLoading(false);
     }
@@ -91,6 +126,28 @@ export default function SignupPage() {
         </div>
         
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Role</label>
+            <div className="role-toggle" role="group" aria-label="Choose role">
+              <button
+                type="button"
+                className={`role-btn ${formData.role === 'student' ? 'active' : ''}`}
+                onClick={() => selectRole('student')}
+              >
+                <span className="role-icon" aria-hidden>🎓</span>
+                Student
+              </button>
+              <button
+                type="button"
+                className={`role-btn ${formData.role === 'tutor' ? 'active' : ''}`}
+                onClick={() => selectRole('tutor')}
+              >
+                <span className="role-icon" aria-hidden>👨‍🏫</span>
+                Tutor
+              </button>
+            </div>
+            {errors.role && <span className="error-message">{errors.role}</span>}
+          </div>
           <div className="form-group">
             <label htmlFor="fullName">Full Name</label>
             <input
@@ -176,6 +233,26 @@ export default function SignupPage() {
             {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
+        <div style={{ marginTop: "0.75rem" }}>
+          <button
+            type="button"
+            className="signup-submit"
+            style={{ background: '#6b7280' }}
+            onClick={() => createDemoAccount('student')}
+            disabled={isLoading}
+          >
+            {isLoading ? "Setting up Demo..." : "Create Demo Account (Student)"}
+          </button>
+          <button
+            type="button"
+            className="signup-submit"
+            style={{ marginTop: '0.5rem', background: '#475569' }}
+            onClick={() => createDemoAccount('tutor')}
+            disabled={isLoading}
+          >
+            {isLoading ? "Setting up Demo..." : "Create Demo Account (Tutor)"}
+          </button>
+        </div>
         
         <div className="signup-footer">
           <p>
