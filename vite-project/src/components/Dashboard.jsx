@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCoins } from "../context/CoinContext.jsx";
+import LessonPage from "./LessonPage"; // adjust path
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -275,31 +276,21 @@ export default function Dashboard() {
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="action-btn primary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateTutorAction("conduct_session");
-              }}>Conduct a tutoring session</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateTutorAction("positive_rating");
-              }}>Receive positive rating</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateTutorAction("consistency_bonus");
-              }}>Consistency bonus</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateTutorAction("upload_material");
-              }}>Upload extra materials</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateTutorAction("student_engagement");
-              }}>Student engagement bonus</button>
+              <button className="action-btn primary" onClick={() => setSelectedAction("conduct_session")}>
+                Conduct a tutoring session
+              </button>
+              <button className="action-btn secondary" onClick={() => setSelectedAction("positive_rating")}>
+                Receive positive rating
+              </button>
+              <button className="action-btn secondary" onClick={() => setSelectedAction("consistency_bonus")}>
+                Consistency bonus
+              </button>
+              <button className="action-btn secondary" onClick={() => setSelectedAction("upload_material")}>
+                📤 Upload Materials
+              </button>
+              <button className="action-btn secondary" onClick={() => setSelectedAction("student_engagement")}>
+                Student engagement bonus
+              </button>
             </div>
           )}
           {role === "student" ? (
@@ -462,6 +453,35 @@ export default function Dashboard() {
         </div>
       )}
 
+      
+
+      {selectedAction === "upload_material" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Upload Materials</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+            <div className="modal-body">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  simulateTutorAction("upload_material");
+                  alert("📤 Materials uploaded successfully! Coins awarded.");
+                  setSelectedAction("");
+                }}
+              >
+                <input
+                  type="file"
+                  required
+                  style={{ marginBottom: "10px" }}
+                />
+                <button type="submit" className="action-btn primary">Upload</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
