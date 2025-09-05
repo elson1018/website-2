@@ -1,73 +1,70 @@
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./AboutPage.css";
 
 export default function AboutPage() {
   const teamMembers = [
-    {
-      name: "Tan Chin Qian",
-      role: "CEO & Founder",
-      avatar: "👩‍💼",
-      bio: "Passionate about creating innovative solutions that make a difference."
-    },
-    {
-      name: "Elson Ooi",
-      role: "Founder",
-      avatar: "👨‍💻",
-      bio: "Technology enthusiast with 10+ years of experience in software development."
-    },
-    {
-      name: "Goo Yong Shen",
-      role: "超强男人",
-      avatar: "👩‍🎨",
-      bio: "Creative designer focused on user experience and beautiful interfaces."
-    },
-    {
-      name: "Chong Han Zhneg",
-      role: "Head of Design",
-      avatar: "👨‍🔧",
-      bio: "Full-stack developer who loves building scalable applications."
-    }
-  ];
+  {
+    name: "Tan Chin Qian",
+    role: "CEO & Founder",
+    avatar: "🤵",
+    bio: "Driven by a passion for education, he leads NaiNaiLong with the vision of making quality learning accessible to everyone."
+  },
+  {
+    name: "Elson Ooi",
+    role: "Co-Founder & Tech Lead",
+    avatar: "👨‍💻",
+    bio: "The backbone of our platform — Elson designs and builds the technology that connects students with the right tutors."
+  },
+  {
+    name: "Goo Yong Shen",
+    role: "Community & Engagement Lead",
+    avatar: "👨‍🔧",
+    bio: "A natural motivator, he ensures both students and tutors feel supported, valued, and excited to learn and teach."
+  },
+  {
+    name: "Chong Han Zhneg",
+    role: "Head of Learning Experience",
+    avatar: "🧑‍🎨",
+    bio: "Focused on user experience, he creates engaging and intuitive designs that make learning enjoyable for all."
+  }
+];
 
   return (
     <div className="about-page">
-      <Navbar />
       
       <main className="about-content">
         <section className="about-hero">
           <h1>About NaiNaiLong</h1>
-          <p>We're on a mission to make technology accessible to everyone</p>
+          <p>We’re on a mission to make quality tutoring accessible for every learner.</p>
         </section>
 
         <section className="about-story">
           <div className="story-content">
             <h2>Our Story</h2>
             <p>
-              Founded in 2025, NaiNaiLong started as a simple idea: what if we could create 
-              an application that truly understands what users need? Our journey began 
-              with a small team of passionate developers and designers who believed that 
-              great software should be both powerful and easy to use.
+              Founded in 2025, NaiNaiLong started with a simple idea: what if every student 
+              could find the right tutor, anytime and anywhere? We wanted to make 
+              learning flexible, engaging, and rewarding.
             </p>
             <p>
-              Today, we're proud to serve thousands of users worldwide, helping them 
-              accomplish their goals with our intuitive and reliable platform. We continue 
-              to innovate and improve, always keeping our users' needs at the heart of 
-              everything we do.
+              Today, we’re connecting students and tutors across multiple subjects — 
+              from math and coding to languages and science. With our unique 
+              coin-based reward system and easy-to-use platform, we help learners stay 
+              motivated while tutors grow their impact.
             </p>
           </div>
           <div className="story-stats">
             <div className="stat">
-              <h3>10K+</h3>
-              <p>Active Users</p>
+              <h3>1K+</h3>
+              <p>Students & Tutors</p>
             </div>
             <div className="stat">
-              <h3>50+</h3>
-              <p>Features</p>
+              <h3>20+</h3>
+              <p>Subjects Covered</p>
             </div>
             <div className="stat">
-              <h3>99.9%</h3>
-              <p>Uptime</p>
+              <h3>95%</h3>
+              <p>Satisfaction Rate</p>
             </div>
           </div>
         </section>
@@ -77,23 +74,23 @@ export default function AboutPage() {
           <div className="values-grid">
             <div className="value-card">
               <div className="value-icon">🎯</div>
-              <h3>User-First</h3>
-              <p>Everything we build starts with understanding our users' needs.</p>
-            </div>
-            <div className="value-card">
-              <div className="value-icon">🚀</div>
-              <h3>Innovation</h3>
-              <p>We constantly push boundaries to create better solutions.</p>
+              <h3>Student Success</h3>
+              <p>We focus on helping students achieve their learning goals.</p>
             </div>
             <div className="value-card">
               <div className="value-icon">🤝</div>
-              <h3>Collaboration</h3>
-              <p>Great things happen when we work together as a team.</p>
+              <h3>Empowering Tutors</h3>
+              <p>We give tutors the tools and support they need to thrive.</p>
             </div>
             <div className="value-card">
-              <div className="value-icon">💎</div>
-              <h3>Quality</h3>
-              <p>We never compromise on the quality of our products.</p>
+              <div className="value-icon">📚</div>
+              <h3>Accessible Learning</h3>
+              <p>Education should be flexible, affordable, and available to all.</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon">💡</div>
+              <h3>Continuous Growth</h3>
+              <p>We believe in lifelong learning — for students and tutors alike.</p>
             </div>
           </div>
         </section>

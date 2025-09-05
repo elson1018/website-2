@@ -5,31 +5,32 @@ export default function Features() {
   const [activeFeature, setActiveFeature] = useState(0);
   
   const features = [
-    {
-      icon: "⚡",
-      title: "Lightning Fast",
-      description: "Built with modern technology for optimal performance",
-      details: "Our app loads in milliseconds and provides instant feedback to all your interactions."
-    },
-    {
-      icon: "🔒",
-      title: "Secure by Design",
-      description: "Your data is protected with enterprise-grade security",
-      details: "We use industry-standard encryption and follow security best practices to keep your information safe."
-    },
-    {
-      icon: "📱",
-      title: "Responsive Design",
-      description: "Works perfectly on all devices and screen sizes",
-      details: "Whether you're on desktop, tablet, or mobile, our app adapts to provide the best experience."
-    },
-    {
-      icon: "🎨",
-      title: "Beautiful UI",
-      description: "Modern and intuitive interface design",
-      details: "Carefully crafted user experience that makes using our app a pleasure."
-    }
-  ];
+  {
+    icon: "🎓",
+    title: "Expert Tutors",
+    description: "Learn from verified and experienced tutors.",
+    details: "Our tutors are carefully selected, reviewed by students, and dedicated to helping you succeed."
+  },
+  {
+    icon: "📚",
+    title: "Wide Range of Subjects",
+    description: "From math and coding to languages and science.",
+    details: "Easily find a tutor who matches your learning needs across different fields."
+  },
+  {
+    icon: "🕒",
+    title: "Flexible Scheduling",
+    description: "Lessons that fit your busy lifestyle.",
+    details: "Book sessions anytime and study at your own pace, whether day or night."
+  },
+  {
+    icon: "💰",
+    title: "Reward System",
+    description: "Earn and spend coins as you learn.",
+    details: "Stay motivated with our unique coin-based reward system for both students and tutors."
+  }
+];
+
 
   return (
     <section className="features">

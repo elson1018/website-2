@@ -1,15 +1,65 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useCoins } from "../context/CoinContext.jsx";
 import "./Dashboard.css";
 
 export default function Dashboard() {
   const { role, setRole, studentCoins, tutorCoins, simulateStudentAction, simulateTutorAction, streaks } = useCoins();
+
+  const ran = useRef(false);
+  const navigate = useNavigate();
+
+  const [hasLoggedInToday, setHasLoggedInToday] = useState(false);
+
+  useEffect(() => {
+    const lastLogin = localStorage.getItem("last-daily-login");
+    const today = new Date().toDateString();
+    if (lastLogin === today) {
+      setHasLoggedInToday(true);
+    }
+  }, []);
+
+  const handleDailyLogin = () => {
+    const raw = localStorage.getItem("auth-user");
+    if (!raw) { 
+      alert("Please log in to perform this action."); 
+      return; 
+    }
+
+    const today = new Date().toDateString();
+    localStorage.setItem("last-daily-login", today); // save today as last login
+    setHasLoggedInToday(true); // disable button after click
+
+    simulateStudentAction("daily_login");
+    alert("🎉 Daily login successful! Coins awarded.");
+  };
+
+  const [selectedAction, setSelectedAction] = useState("");
+
+  const [assignments, setAssignments] = useState([
+    { id: 1, title: "Math Quiz 1", completed: false },
+    { id: 2, title: "Science Homework", completed: false },
+    { id: 3, title: "English Essay", completed: false },
+  ]);
+
+  const [selectedTutor, setSelectedTutor] = useState(null);
+
+  useEffect(() => {
+    if (ran.current) return;  
+    ran.current = true;
+
+    const raw = localStorage.getItem("auth-user");
+    if (!raw) {
+      alert("Please log in to access the dashboard.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const [stats, setStats] = useState({
     users: 0,
-    projects: 0,
-    tasks: 0,
-    completed: 0
+    tutors: 0,
+    sessions: 0,
+    satisfaction: 0
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,25 +70,22 @@ export default function Dashboard() {
     { id: 4, name: "Daniel Wong", subject: "English", experience: 6, rating: 4.6, description: "Daniel improves grammar, writing, and literature analysis with structured frameworks and plenty of feedback." },
     { id: 5, name: "Evelyn Lim", subject: "Biology", experience: 3, rating: 4.5, description: "Evelyn teaches exam-oriented biology with diagrams and active recall. Great for secondary to pre-university levels." },
   ]);
-  const [selectedTutor, setSelectedTutor] = useState(null);
-  const [selectedAction, setSelectedAction] = useState("");
+
   const location = useLocation();
 
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setStats({
-        users: 1247,
-        projects: 89,
-        tasks: 156,
-        completed: 142
+        users: 1247,      // total users on platform
+        tutors: 320,      // number of tutors
+        sessions: 156,    // tutoring sessions this month
+        satisfaction: 95  // satisfaction rate %
       });
       
       setRecentActivity([
-        { id: 1, action: "New user registered", time: "2 minutes ago", type: "user" },
-        { id: 2, action: "Project 'Website Redesign' completed", time: "1 hour ago", type: "project" },
-        { id: 3, action: "Task 'Update documentation' assigned", time: "3 hours ago", type: "task" },
-        { id: 4, action: "New feature 'Dark Mode' deployed", time: "5 hours ago", type: "feature" }
+        { id: 1, action: "Student Alice booked a Math session", time: "2 minutes ago", type: "session" },
+        { id: 2, action: "Tutor Benjamin uploaded new Physics materials", time: "1 hour ago", type: "upload" },
+        { id: 3, action: "Carmen earned +20 coins for great feedback", time: "3 hours ago", type: "coins" }
       ]);
       
       setIsLoading(false);
@@ -56,11 +103,11 @@ export default function Dashboard() {
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'user': return '👤';
-      case 'project': return '📁';
-      case 'task': return '✅';
-      case 'feature': return '🚀';
-      default: return '📝';
+      case "session": return "📅";
+      case "upload": return "📚";
+      case "coins": return "💰";
+      case "user": return "👤";
+      default: return "📝";
     }
   };
 
@@ -97,31 +144,28 @@ export default function Dashboard() {
           <div className="stat-icon">👥</div>
           <div className="stat-content">
             <h3>{stats.users.toLocaleString()}</h3>
-            <p>Total Users</p>
+            <p>Total Learners</p>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">📁</div>
+          <div className="stat-icon">👨‍🏫</div>
           <div className="stat-content">
-            <h3>{stats.projects}</h3>
-            <p>Active Projects</p>
+            <h3>{stats.tutors}</h3>
+            <p>Active Tutors</p>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">📋</div>
+          <div className="stat-icon">📅</div>
           <div className="stat-content">
-            <h3>{stats.tasks}</h3>
-            <p>Total Tasks</p>
+            <h3>{stats.sessions}</h3>
+            <p>Sessions This Month</p>
           </div>
         </div>
-        
         <div className="stat-card">
-          <div className="stat-icon">✅</div>
+          <div className="stat-icon">⭐</div>
           <div className="stat-content">
-            <h3>{stats.completed}</h3>
-            <p>Completed</p>
+            <h3>{stats.satisfaction}%</h3>
+            <p>Satisfaction Rate</p>
           </div>
         </div>
       </div>
@@ -174,36 +218,60 @@ export default function Dashboard() {
 
         <div className="quick-actions">
           <h3>Quick Actions</h3>
-          <div className="action-buttons">
-            <button className="action-btn primary">➕ New Project</button>
-            <button className="action-btn secondary">📊 View Reports</button>
-            <button className="action-btn secondary">⚙️ Settings</button>
-            <button className="action-btn secondary">📧 Send Message</button>
-          </div>
+
+            {role === "student" ? (
+              <div className="action-buttons">
+                <button className="action-btn primary">🔍 Find a Tutor</button>
+                <button className="action-btn secondary">📅 Book a Session</button>
+                <button className="action-btn secondary">📚 View Assignments</button>
+                <button className="action-btn secondary">💰 Redeem Rewards</button>
+              </div>
+            ) : (
+              <div className="action-buttons">
+                <button className="action-btn primary">📅 Start a Session</button>
+                <button className="action-btn secondary">📤 Upload Materials</button>
+                <button className="action-btn secondary">📊 View Earnings</button>
+                <button className="action-btn secondary">💬 Respond to Feedback</button>
+              </div>
+            )}
 
           <h3 style={{ marginTop: 24 }}>Earning Actions</h3>
           {role === "student" ? (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="action-btn primary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateStudentAction("attend_session");
-              }}>Attend a tutoring session</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateStudentAction("complete_assignment");
-              }}>Complete assignment/quiz</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateStudentAction("give_feedback");
-              }}>Give useful feedback</button>
-              <button className="action-btn secondary" onClick={() => {
-                const raw = localStorage.getItem("auth-user");
-                if (!raw) { alert("Please log in to perform this action."); return; }
-                simulateStudentAction("daily_login");
-              }}>Daily login</button>
+              <button
+                className="action-btn primary"
+                onClick={() => {
+                  navigate("/dashboard#tutors"); 
+                }}
+              >
+                📅 Attend a Lesson
+              </button>
+
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("assignments")}
+              >
+                📚 Complete Assignments
+              </button>
+
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("feedback")}
+              >
+                Give useful feedback
+              </button>
+
+              <button
+                className="action-btn secondary"
+                onClick={handleDailyLogin}
+                disabled={hasLoggedInToday}
+                style={{
+                  opacity: hasLoggedInToday ? 0.6 : 1,
+                  cursor: hasLoggedInToday ? "not-allowed" : "pointer"
+                }}
+              >
+                  {hasLoggedInToday ? "✅ Checked In" : "Check In"}
+              </button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -275,12 +343,125 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="action-btn secondary" onClick={() => setSelectedTutor(null)}>Close</button>
-              <button className="action-btn primary">Join Class</button>
+              <button 
+                className="action-btn secondary" 
+                onClick={() => setSelectedTutor(null)}
+              >
+                Close
+              </button>
+
+              <button
+                className="action-btn primary"
+                onClick={() => {
+                  const raw = localStorage.getItem("auth-user");
+                  if (!raw) {
+                    alert("Please log in to perform this action.");
+                    return;
+                  }
+
+                  alert(`You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`);
+
+                  simulateStudentAction("attend_session");
+
+                  setSelectedTutor(null);
+                }}
+              >
+                💳 Pay & Join Class
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {selectedAction === "assignments" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Assignments</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+
+            <div className="modal-body">
+              {assignments.filter(a => !a.completed).length === 0 ? (
+                <p>✅ All assignments are completed!</p>
+              ) : (
+                <ul>
+                  {assignments.filter(a => !a.completed).map(a => (
+                    <li key={a.id} style={{ marginBottom: 12 }}>
+                      <span>{a.title}</span>
+                      <button
+                        className="action-btn primary"
+                        style={{ marginLeft: 12 }}
+                        onClick={() => {
+                          const raw = localStorage.getItem("auth-user");
+                          if (!raw) { alert("Please log in to perform this action."); return; }
+
+                          // mark as completed
+                          setAssignments(prev =>
+                            prev.map(x => x.id === a.id ? { ...x, completed: true } : x)
+                          );
+
+                          simulateStudentAction("complete_assignment");
+
+                          alert(`🎉 You completed ${a.title} and earned coins!`);
+                        }}
+                      >
+                        Complete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedAction === "feedback" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Give Feedback</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+
+            <div className="modal-body">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const raw = localStorage.getItem("auth-user");
+                  if (!raw) { alert("Please log in to perform this action."); return; }
+
+                  simulateStudentAction("give_feedback");
+                  alert("🎉 Thank you for your valuable feedback! Coins awarded.");
+                  setSelectedAction("");
+                }}
+              >
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <textarea
+                  required
+                  placeholder="Write your feedback here..."
+                  style={{
+                    width: "80%",          // smaller width than 100%
+                    minHeight: "100px",
+                    padding: "8px",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                    marginBottom: "12px",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+
+                <button type="submit" className="action-btn primary">
+                  Submit Feedback
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

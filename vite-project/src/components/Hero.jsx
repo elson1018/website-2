@@ -5,10 +5,11 @@ import "./Hero.css";
 export default function Hero() {
   const [currentText, setCurrentText] = useState(0);
   const texts = [
-    "Build amazing things",
-    "Connect with others", 
+    "Find your perfect tutor today",
+    "Learn anytime, anywhere", 
     "Learn and grow",
-    "Make a difference"
+    "Make a difference",
+    "Grow your skills with expert tutors"
   ];
 
   useEffect(() => {
@@ -38,14 +39,19 @@ export default function Hero() {
       </div>
       <div className="hero-visual">
         <div className="floating-card">
-          <div className="card-icon">🚀</div>
-          <h3>Fast & Reliable</h3>
-          <p>Built with modern technology</p>
+          <div className="card-icon">🎓</div>
+          <h3>Expert Tutors</h3>
+          <p>Learn from top-rated professionals</p>
         </div>
         <div className="floating-card">
-          <div className="card-icon">🔒</div>
-          <h3>Secure</h3>
-          <p>Your data is safe with us</p>
+          <div className="card-icon">🕒</div>
+          <h3>Flexible Scheduling</h3>
+          <p>Book lessons at your own time</p>
+        </div>
+        <div className="floating-card">
+          <div className="card-icon">📚</div>
+          <h3>Wide Range of Subjects</h3>
+          <p>Math, Coding, Languages, and more</p>
         </div>
       </div>
     </div>

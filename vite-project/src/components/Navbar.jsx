@@ -59,7 +59,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="logo">
-        <Link to="/">NaiNaILong</Link>
+        <Link to="/">NaiNaiLong</Link>
       </div>
 
       <div className="search-container">
@@ -69,9 +69,6 @@ export default function Navbar() {
       </div>
 
       <div className="nav-buttons">
-        <Link to="/rewards" className="nav-link">
-          Rewards
-        </Link>
         <Link to="/dashboard" className="nav-link">
           Dashboard
         </Link>
@@ -81,9 +78,12 @@ export default function Navbar() {
         <Link to="/contact" className="nav-link">
           Contact
         </Link>
-        <span className="nav-link" style={{ pointerEvents: "none", fontWeight: 600 }}>
-          {role === "student" ? `Coins: ${studentCoins}` : `Coins: ${tutorCoins}`}
-        </span>
+        {authUser ? (
+           <span className="nav-link" style={{ pointerEvents: "none", fontWeight: 600 }}>
+            {role === "student" ? `Coins: ${studentCoins}` : `Coins: ${tutorCoins}`}
+          </span>
+        ): null}
+       
         {authUser ? (
           <div className="nav-profile profile-menu" ref={menuRef}>
             <button className="profile-trigger" onClick={() => setIsMenuOpen((v) => !v)} aria-haspopup="menu" aria-expanded={isMenuOpen}>

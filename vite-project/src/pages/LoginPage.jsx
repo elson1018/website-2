@@ -15,7 +15,7 @@ export default function LoginPage() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
-        prev,
+        ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
     // Clear error when user starts typing
@@ -50,13 +50,17 @@ export default function LoginPage() {
     
     setIsLoading(true);
     
-    // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // For demo purposes, just redirect to home
-      // In a real app, you'd handle authentication here
-      navigate("/");
+      const userData = {
+        email: formData.email,
+        fullName: formData.email.split('@')[0], // Use email prefix as name
+        role: 'student' // Default role
+      };
+      
+      localStorage.setItem('auth-user', JSON.stringify(userData));
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {

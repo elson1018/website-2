@@ -10,12 +10,6 @@ export default function Footer() {
         <div className="footer-section">
           <h3>NaiNaiLong</h3>
           <p>Building the future, one app at a time. Join us on this amazing journey.</p>
-          <div className="social-links">
-            <a href="#" className="social-link">📘</a>
-            <a href="#" className="social-link">🐦</a>
-            <a href="#" className="social-link">📷</a>
-            <a href="#" className="social-link">💼</a>
-          </div>
         </div>
         
         <div className="footer-section">

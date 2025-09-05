@@ -39,7 +39,6 @@ export default function ContactPage() {
 
   return (
     <div className="contact-page">
-      <Navbar />
       
       <main className="contact-content">
         <section className="contact-hero">
