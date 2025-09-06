@@ -10,7 +10,14 @@ export default function Dashboard() {
   const rawUser = localStorage.getItem("auth-user");
   const currentUser = rawUser ? JSON.parse(rawUser) : null;
 
-  const { role, setRole, studentCoins, tutorCoins, simulateStudentAction, simulateTutorAction, streaks } = useCoins();
+  const {
+    role,
+    setRole,
+    studentCoins,
+    tutorCoins,
+    simulateStudentAction,
+    simulateTutorAction,
+  } = useCoins();
 
   const ran = useRef(false);
   const navigate = useNavigate();
@@ -19,10 +26,13 @@ export default function Dashboard() {
 
   const addActivity = (actionText, type = "user") => {
     const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setRecentActivity(prev => [
+    const timeString = now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setRecentActivity((prev) => [
       { id: prev.length + 1, action: actionText, time: timeString, type },
-      ...prev
+      ...prev,
     ]);
   };
 
@@ -38,31 +48,113 @@ export default function Dashboard() {
   const [aiInput, setAiInput] = useState("");
   const [aiMessages, setAiMessages] = useState([]);
 
+  // Filter states
+  const [filters, setFilters] = useState({
+    subject: "",
+    priceRange: { min: 0, max: 100 },
+    experience: { min: 0, max: 10 },
+    rating: { min: 0, max: 5 },
+    searchQuery: "",
+  });
+
   const handleAiSend = (e) => {
     e.preventDefault();
     if (!aiInput.trim()) return;
 
-    setAiMessages(prev => [...prev, { type: "user", text: aiInput }]);
+    setAiMessages((prev) => [...prev, { type: "user", text: aiInput }]);
 
     setTimeout(() => {
-      setAiMessages(prev => [...prev, { type: "ai", text: "🤖 Here's a helpful tip for you!" }]);
+      setAiMessages((prev) => [
+        ...prev,
+        { type: "ai", text: "🤖 Here's a helpful tip for you!" },
+      ]);
     }, 800);
 
     setAiInput("");
   };
 
+  // Filter functions
+  const updateFilter = (filterType, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      subject: "",
+      priceRange: { min: 0, max: 100 },
+      experience: { min: 0, max: 10 },
+      rating: { min: 0, max: 5 },
+      searchQuery: "",
+    });
+  };
+
+  const getFilteredTutors = () => {
+    return tutors.filter((tutor) => {
+      // Subject filter
+      if (
+        filters.subject &&
+        tutor.subject.toLowerCase() !== filters.subject.toLowerCase()
+      ) {
+        return false;
+      }
+
+      // Price range filter
+      if (
+        tutor.price < filters.priceRange.min ||
+        tutor.price > filters.priceRange.max
+      ) {
+        return false;
+      }
+
+      // Experience filter
+      if (
+        tutor.experience < filters.experience.min ||
+        tutor.experience > filters.experience.max
+      ) {
+        return false;
+      }
+
+      // Rating filter
+      if (
+        tutor.rating < filters.rating.min ||
+        tutor.rating > filters.rating.max
+      ) {
+        return false;
+      }
+
+      // Search query filter
+      if (filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesName = tutor.name.toLowerCase().includes(query);
+        const matchesSubject = tutor.subject.toLowerCase().includes(query);
+        const matchesDescription = tutor.description
+          .toLowerCase()
+          .includes(query);
+
+        if (!matchesName && !matchesSubject && !matchesDescription) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  };
+
   const [sessions, setSessions] = useState([
     {
-    id: 1,
-    tutor: "Alice Tan",
-    student: "Elson",
-    subject: "Math",
-    date: "2025-09-06",
-    time: "15:00",
-    type: "live",
-    status: "completed",
-    feedback: null,
-    }
+      id: 1,
+      tutor: "Alice Tan",
+      student: "Elson",
+      subject: "Math",
+      date: "2025-09-06",
+      time: "15:00",
+      type: "live",
+      status: "completed",
+      feedback: null,
+    },
   ]);
 
   useEffect(() => {
@@ -103,7 +195,7 @@ export default function Dashboard() {
   const [selectedTutor, setSelectedTutor] = useState(null);
 
   useEffect(() => {
-    if (ran.current) return;  
+    if (ran.current) return;
     ran.current = true;
 
     const raw = localStorage.getItem("auth-user");
@@ -117,16 +209,61 @@ export default function Dashboard() {
     users: 0,
     tutors: 0,
     sessions: 0,
-    satisfaction: 0
+    satisfaction: 0,
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [tutors] = useState([
-    { id: 1, name: "Alice Tan", subject: "Mathematics", experience: 5, rating: 4.8, description: "Alice specializes in algebra, calculus, and competition math. She focuses on problem-solving strategies and building strong fundamentals." },
-    { id: 2, name: "Benjamin Lee", subject: "Physics", experience: 7, rating: 4.9, description: "Benjamin makes physics intuitive with visuals and real-world examples. Experienced in IGCSE, A-Levels, and AP curricula." },
-    { id: 3, name: "Carmen Ong", subject: "Chemistry", experience: 4, rating: 4.7, description: "Carmen simplifies complex concepts in organic and physical chemistry. Provides concise notes and practice questions." },
-    { id: 4, name: "Daniel Wong", subject: "English", experience: 6, rating: 4.6, description: "Daniel improves grammar, writing, and literature analysis with structured frameworks and plenty of feedback." },
-    { id: 5, name: "Evelyn Lim", subject: "Biology", experience: 3, rating: 4.5, description: "Evelyn teaches exam-oriented biology with diagrams and active recall. Great for secondary to pre-university levels." },
+    {
+      id: 1,
+      name: "Alice Tan",
+      subject: "Mathematics",
+      experience: 5,
+      rating: 4.8,
+      price: 45,
+      description:
+        "Alice specializes in algebra, calculus, and competition math. She focuses on problem-solving strategies and building strong fundamentals.",
+    },
+    {
+      id: 2,
+      name: "Benjamin Lee",
+      subject: "Physics",
+      experience: 7,
+      rating: 4.9,
+      price: 55,
+      description:
+        "Benjamin makes physics intuitive with visuals and real-world examples. Experienced in IGCSE, A-Levels, and AP curricula.",
+    },
+    {
+      id: 3,
+      name: "Carmen Ong",
+      subject: "Chemistry",
+      experience: 4,
+      rating: 4.7,
+      price: 40,
+      description:
+        "Carmen simplifies complex concepts in organic and physical chemistry. Provides concise notes and practice questions.",
+    },
+    {
+      id: 4,
+      name: "Daniel Wong",
+      subject: "English",
+      experience: 6,
+      rating: 4.6,
+      price: 50,
+      description:
+        "Daniel improves grammar, writing, and literature analysis with structured frameworks and plenty of feedback.",
+    },
+    {
+      id: 5,
+      name: "Evelyn Lim",
+      subject: "Biology",
+      experience: 3,
+      rating: 4.5,
+      price: 35,
+      description:
+        "Evelyn teaches exam-oriented biology with diagrams and active recall. Great for secondary to pre-university levels.",
+    },
   ]);
 
   const location = useLocation();
@@ -134,12 +271,12 @@ export default function Dashboard() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setStats({
-        users: 1247,      // total users on platform
-        tutors: 320,      // number of tutors
-        sessions: 156,    // tutoring sessions this month
-        satisfaction: 95  // satisfaction rate 
+        users: 1247, // total users on platform
+        tutors: 320, // number of tutors
+        sessions: 156, // tutoring sessions this month
+        satisfaction: 95, // satisfaction rate
       });
-      
+
       setIsLoading(false);
     }, 1500);
 
@@ -155,11 +292,16 @@ export default function Dashboard() {
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case "session": return "📅";
-      case "upload": return "📚";
-      case "coins": return "💰";
-      case "user": return "👤";
-      default: return "📝";
+      case "session":
+        return "📅";
+      case "upload":
+        return "📚";
+      case "coins":
+        return "💰";
+      case "user":
+        return "👤";
+      default:
+        return "📝";
     }
   };
 
@@ -179,7 +321,9 @@ export default function Dashboard() {
     <div className="dashboard">
       <div className="dashboard-header">
         <h2>Welcome back, {currentUser?.fullName || "Learner"}! 👋</h2>
-        <p>Check your upcoming sessions, achievements, and rewards for today 📚✨</p>
+        <p>
+          Check your upcoming sessions, achievements, and rewards for today 📚✨
+        </p>
         <div className="role-bar">
           <label className="role-label">Role:</label>
           <select
@@ -190,7 +334,9 @@ export default function Dashboard() {
             <option value="student">Student</option>
             <option value="tutor">Tutor</option>
           </select>
-          <span className="coin-badge student">Student Coins: {studentCoins}</span>
+          <span className="coin-badge student">
+            Student Coins: {studentCoins}
+          </span>
           <span className="coin-badge tutor">Tutor Coins: {tutorCoins}</span>
         </div>
       </div>
@@ -232,36 +378,200 @@ export default function Dashboard() {
             <TutorRecommendation tutors={tutors} />
             <div id="tutors" className="tutors-panel">
               <h3>Find Your Tutor</h3>
-              <div className="tutor-grid">
-                {tutors
-                  .filter((t) => {
-                    const params = new URLSearchParams(window.location.search);
-                    const q = (params.get("q") || "").toLowerCase();
-                    if (!q) return true;
-                    return t.subject.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
-                  })
-                  .map(t => (
-                    <div key={t.id} className="tutor-card">
-                      <div className="tutor-header">
-                        <div className="avatar" aria-hidden>👩‍🏫</div>
-                        <div>
-                          <div className="tutor-name">{t.name}</div>
-                          <div className="tutor-subject">{t.subject}</div>
-                        </div>
-                      </div>
-                      <div className="tutor-meta">
-                        <span>Experience: {t.experience} yrs</span>
-                        <span className="rating">⭐ {t.rating}</span>
-                      </div>
-                      <button className="action-btn primary" onClick={() => setSelectedTutor(t)}>Learn More</button>
+
+              {/* Filter Section */}
+              <div className="tutor-filters">
+                <div className="filter-row">
+                  <div className="filter-group">
+                    <label>Search:</label>
+                    <input
+                      type="text"
+                      placeholder="Search by name, subject, or description..."
+                      value={filters.searchQuery}
+                      onChange={(e) =>
+                        updateFilter("searchQuery", e.target.value)
+                      }
+                      className="filter-input"
+                    />
+                  </div>
+
+                  <div className="filter-group">
+                    <label>Subject:</label>
+                    <select
+                      value={filters.subject}
+                      onChange={(e) => updateFilter("subject", e.target.value)}
+                      className="filter-select"
+                    >
+                      <option value="">All Subjects</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="English">English</option>
+                      <option value="Biology">Biology</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="filter-row">
+                  <div className="filter-group">
+                    <label>
+                      Price Range: ${filters.priceRange.min} - $
+                      {filters.priceRange.max}
+                    </label>
+                    <div className="range-inputs">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={filters.priceRange.min}
+                        onChange={(e) =>
+                          updateFilter("priceRange", {
+                            ...filters.priceRange,
+                            min: parseInt(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={filters.priceRange.max}
+                        onChange={(e) =>
+                          updateFilter("priceRange", {
+                            ...filters.priceRange,
+                            max: parseInt(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="filter-group">
+                    <label>
+                      Experience: {filters.experience.min} -{" "}
+                      {filters.experience.max} years
+                    </label>
+                    <div className="range-inputs">
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={filters.experience.min}
+                        onChange={(e) =>
+                          updateFilter("experience", {
+                            ...filters.experience,
+                            min: parseInt(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={filters.experience.max}
+                        onChange={(e) =>
+                          updateFilter("experience", {
+                            ...filters.experience,
+                            max: parseInt(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="filter-row">
+                  <div className="filter-group">
+                    <label>
+                      Rating: {filters.rating.min} - {filters.rating.max} stars
+                    </label>
+                    <div className="range-inputs">
+                      <input
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        value={filters.rating.min}
+                        onChange={(e) =>
+                          updateFilter("rating", {
+                            ...filters.rating,
+                            min: parseFloat(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
+                      <input
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        value={filters.rating.max}
+                        onChange={(e) =>
+                          updateFilter("rating", {
+                            ...filters.rating,
+                            max: parseFloat(e.target.value),
+                          })
+                        }
+                        className="range-slider"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="filter-actions">
+                    <button
+                      onClick={clearFilters}
+                      className="clear-filters-btn"
+                    >
+                      Clear Filters
+                    </button>
+                    <span className="results-count">
+                      {getFilteredTutors().length} tutors found
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tutor-grid">
+                {getFilteredTutors().map((t) => (
+                  <div key={t.id} className="tutor-card">
+                    <div className="tutor-header">
+                      <div className="avatar" aria-hidden>
+                        👩‍🏫
+                      </div>
+                      <div>
+                        <div className="tutor-name">{t.name}</div>
+                        <div className="tutor-subject">{t.subject}</div>
+                      </div>
+                    </div>
+                    <div className="tutor-meta">
+                      <span>Experience: {t.experience} yrs</span>
+                      <span className="rating">⭐ {t.rating}</span>
+                    </div>
+                    <div className="tutor-price">
+                      <span className="price-label">Price per hour:</span>
+                      <span className="price-amount">${t.price}</span>
+                    </div>
+                    <button
+                      className="action-btn primary"
+                      onClick={() => setSelectedTutor(t)}
+                    >
+                      Learn More
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </>
         ) : (
           <>
-            <PerformanceInsights sessions={sessions} currentUser={currentUser} />
+            <PerformanceInsights
+              sessions={sessions}
+              currentUser={currentUser}
+            />
             <div> </div>
           </>
         )}
@@ -269,7 +579,7 @@ export default function Dashboard() {
         <div className="recent-activity">
           <h3>Recent Activity</h3>
           <div className="activity-list">
-            {recentActivity.map(activity => (
+            {recentActivity.map((activity) => (
               <div key={activity.id} className="activity-item">
                 <div className="activity-icon">
                   {getActivityIcon(activity.type)}
@@ -286,52 +596,81 @@ export default function Dashboard() {
         <div className="quick-actions">
           <h3>Quick Actions</h3>
 
-            {role === "student" ? (
-              <div className="action-buttons">
-                <button 
-                  className="action-btn primary"
-                  onClick={() => {
-                  navigate("/dashboard#tutors"); 
+          {role === "student" ? (
+            <div className="action-buttons">
+              <button
+                className="action-btn primary"
+                onClick={() => {
+                  navigate("/dashboard#tutors");
                 }}
-                >🔍 Find a Tutor</button>
-                <button
-                  className="action-btn secondary"
-                  onClick={() => setAiOpen(true)}
-                >
-                  🤖 AI Assistant
-                </button>
-                <button 
-                  className="action-btn secondary"
-                  onClick={() => setSelectedAction("assignments")}
-                >📚 View Assignments</button>
-                <button 
-                  className="action-btn secondary"
-                  onClick={() => navigate("/rewards")}
-                >
-                  💰 Redeem Rewards
-                </button>
-                <button
-                  className="action-btn secondary"
-                  onClick={() => setSelectedAction("view_schedule")}
-                >
-                  🗓 My Schedule
-                </button>
-              </div>
-            ) : (
-              <div className="action-buttons">
-                <button className="action-btn primary" onClick={() => setSelectedAction("conduct_session")}>📅 Start a Session</button>
-                <button className="action-btn secondary" onClick={() => setAiOpen(true)}>🤖 AI Assistant</button>
-                <button className="action-btn secondary" onClick={() => setSelectedAction("upload_material")}>📤 Upload Materials</button>
-                <button className="action-btn secondary" onClick={() => setSelectedAction("view_earnings")}>📊 View Earnings</button>
-                <button className="action-btn secondary" onClick={() => setSelectedAction("respond_feedback")}>💬 Respond to Feedback</button>
-                <button
-                  className="action-btn secondary"
-                  onClick={() => setSelectedAction("view_schedule")}
-                >
-                  🗓 My Teaching Schedule
-                </button>
-              </div>
-            )}
+              >
+                🔍 Find a Tutor
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setAiOpen(true)}
+              >
+                🤖 AI Assistant
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("assignments")}
+              >
+                📚 View Assignments
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => navigate("/rewards")}
+              >
+                💰 Redeem Rewards
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("view_schedule")}
+              >
+                🗓 My Schedule
+              </button>
+            </div>
+          ) : (
+            <div className="action-buttons">
+              <button
+                className="action-btn primary"
+                onClick={() => setSelectedAction("conduct_session")}
+              >
+                📅 Start a Session
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setAiOpen(true)}
+              >
+                🤖 AI Assistant
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("upload_material")}
+              >
+                📤 Upload Materials
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("view_earnings")}
+              >
+                📊 View Earnings
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("respond_feedback")}
+              >
+                💬 Respond to Feedback
+              </button>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("view_schedule")}
+              >
+                🗓 My Teaching Schedule
+              </button>
+            </div>
+          )}
 
           <h3 style={{ marginTop: 24 }}>Earning Actions</h3>
           {role === "student" ? (
@@ -339,7 +678,7 @@ export default function Dashboard() {
               <button
                 className="action-btn primary"
                 onClick={() => {
-                  navigate("/dashboard#tutors"); 
+                  navigate("/dashboard#tutors");
                 }}
               >
                 📅 Attend a Lesson
@@ -365,23 +704,32 @@ export default function Dashboard() {
                 disabled={hasLoggedInToday}
                 style={{
                   opacity: hasLoggedInToday ? 0.6 : 1,
-                  cursor: hasLoggedInToday ? "not-allowed" : "pointer"
+                  cursor: hasLoggedInToday ? "not-allowed" : "pointer",
                 }}
               >
-                  {hasLoggedInToday ? "✅ Checked In" : "Check In"}
+                {hasLoggedInToday ? "✅ Checked In" : "Check In"}
               </button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="action-btn primary" onClick={() => setSelectedAction("conduct_session")}>
+              <button
+                className="action-btn primary"
+                onClick={() => setSelectedAction("conduct_session")}
+              >
                 Conduct a tutoring session
               </button>
-              <button className="action-btn secondary" onClick={() => setSelectedAction("respond_feedback")}>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("respond_feedback")}
+              >
                 View Student Feedback
               </button>
-              <button className="action-btn secondary" onClick={() => setSelectedAction("upload_material")}>
+              <button
+                className="action-btn secondary"
+                onClick={() => setSelectedAction("upload_material")}
+              >
                 📤 Upload Materials
-            </button>
+              </button>
             </div>
           )}
         </div>
@@ -391,12 +739,19 @@ export default function Dashboard() {
         <div className="modal-overlay" onClick={() => setSelectedTutor(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="avatar lg" aria-hidden>👩‍🏫</div>
+              <div className="avatar lg" aria-hidden>
+                👩‍🏫
+              </div>
               <div>
                 <div className="tutor-name">{selectedTutor.name}</div>
                 <div className="tutor-subject">{selectedTutor.subject}</div>
               </div>
-              <button className="modal-close" onClick={() => setSelectedTutor(null)}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedTutor(null)}
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <p>{selectedTutor.description}</p>
@@ -404,10 +759,14 @@ export default function Dashboard() {
                 <span>Experience: {selectedTutor.experience} yrs</span>
                 <span className="rating">⭐ {selectedTutor.rating}</span>
               </div>
+              <div className="tutor-price" style={{ marginTop: 12 }}>
+                <span className="price-label">Price per hour:</span>
+                <span className="price-amount">${selectedTutor.price}</span>
+              </div>
             </div>
             <div className="modal-footer">
-              <button 
-                className="action-btn secondary" 
+              <button
+                className="action-btn secondary"
                 onClick={() => setSelectedTutor(null)}
               >
                 Close
@@ -424,7 +783,7 @@ export default function Dashboard() {
 
                   const user = JSON.parse(raw);
 
-                  setSessions(prev => [
+                  setSessions((prev) => [
                     ...prev,
                     {
                       id: prev.length + 1,
@@ -434,15 +793,20 @@ export default function Dashboard() {
                       date: new Date().toISOString().split("T")[0],
                       time: "15:00",
                       type: "live",
-                      status: "upcoming"
-                    }
+                      status: "upcoming",
+                    },
                   ]);
 
                   simulateStudentAction("attend_session");
 
-                  addActivity(`You joined ${selectedTutor.name}'s ${selectedTutor.subject} class`, "session");
+                  addActivity(
+                    `You joined ${selectedTutor.name}'s ${selectedTutor.subject} class`,
+                    "session"
+                  );
 
-                  alert(`You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`);
+                  alert(
+                    `You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`
+                  );
                   setSelectedTutor(null);
                 }}
               >
@@ -458,39 +822,56 @@ export default function Dashboard() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Assignments</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
 
             <div className="modal-body">
-              {assignments.filter(a => !a.completed).length === 0 ? (
+              {assignments.filter((a) => !a.completed).length === 0 ? (
                 <p>✅ All assignments are completed!</p>
               ) : (
                 <ul>
-                  {assignments.filter(a => !a.completed).map(a => (
-                    <li key={a.id} style={{ marginBottom: 12 }}>
-                      <span>{a.title}</span>
-                      <button
-                        className="action-btn primary"
-                        style={{ marginLeft: 12 }}
-                        onClick={() => {
-                          const raw = localStorage.getItem("auth-user");
-                          if (!raw) { alert("Please log in to perform this action."); return; }
+                  {assignments
+                    .filter((a) => !a.completed)
+                    .map((a) => (
+                      <li key={a.id} style={{ marginBottom: 12 }}>
+                        <span>{a.title}</span>
+                        <button
+                          className="action-btn primary"
+                          style={{ marginLeft: 12 }}
+                          onClick={() => {
+                            const raw = localStorage.getItem("auth-user");
+                            if (!raw) {
+                              alert("Please log in to perform this action.");
+                              return;
+                            }
 
-                          setAssignments(prev =>
-                            prev.map(x => x.id === a.id ? { ...x, completed: true } : x)
-                          );
+                            setAssignments((prev) =>
+                              prev.map((x) =>
+                                x.id === a.id ? { ...x, completed: true } : x
+                              )
+                            );
 
-                          simulateStudentAction("complete_assignment");
+                            simulateStudentAction("complete_assignment");
 
-                          addActivity(`Completed assignment: ${a.title}`, "assignment");
+                            addActivity(
+                              `Completed assignment: ${a.title}`,
+                              "assignment"
+                            );
 
-                          alert(`🎉 You completed ${a.title} and earned coins!`);
-                        }}
-                      >
-                        Complete
-                      </button>
-                    </li>
-                  ))}
+                            alert(
+                              `🎉 You completed ${a.title} and earned coins!`
+                            );
+                          }}
+                        >
+                          Complete
+                        </button>
+                      </li>
+                    ))}
                 </ul>
               )}
             </div>
@@ -503,28 +884,35 @@ export default function Dashboard() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Give Feedback</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
 
             <div className="modal-body">
-              {sessions.filter(s => s.student === currentUser?.fullName).length === 0 ? (
+              {sessions.filter((s) => s.student === currentUser?.fullName)
+                .length === 0 ? (
                 <p>⚠️ You need to attend a class before giving feedback.</p>
               ) : (
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     const raw = localStorage.getItem("auth-user");
-                    if (!raw) { alert("Please log in first."); return; }
+                    if (!raw) {
+                      alert("Please log in first.");
+                      return;
+                    }
 
                     const formData = new FormData(e.target);
                     const sessionId = formData.get("session");
                     const feedback = formData.get("feedback");
 
-                    setSessions(prev =>
-                      prev.map(s =>
-                        s.id.toString() === sessionId
-                          ? { ...s, feedback }
-                          : s
+                    setSessions((prev) =>
+                      prev.map((s) =>
+                        s.id.toString() === sessionId ? { ...s, feedback } : s
                       )
                     );
 
@@ -538,8 +926,11 @@ export default function Dashboard() {
                   <label>Select a Tutor:</label>
                   <select name="session" required>
                     {sessions
-                      .filter(s => s.student === currentUser?.fullName && !s.feedback)
-                      .map(s => (
+                      .filter(
+                        (s) =>
+                          s.student === currentUser?.fullName && !s.feedback
+                      )
+                      .map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.subject} with {s.tutor} ({s.date})
                         </option>
@@ -559,7 +950,11 @@ export default function Dashboard() {
                     }}
                   />
 
-                  <button type="submit" className="action-btn primary" style={{ marginTop: "12px" }}>
+                  <button
+                    type="submit"
+                    className="action-btn primary"
+                    style={{ marginTop: "12px" }}
+                  >
                     Submit Feedback
                   </button>
                 </form>
@@ -574,20 +969,31 @@ export default function Dashboard() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Student Feedback</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
 
             <div className="modal-body">
-              {sessions.filter(s => s.tutor === currentUser?.fullName && s.feedback).length === 0 ? (
+              {sessions.filter(
+                (s) => s.tutor === currentUser?.fullName && s.feedback
+              ).length === 0 ? (
                 <p>No feedback yet.</p>
               ) : (
                 <ul>
                   {sessions
-                    .filter(s => s.tutor === currentUser?.fullName && s.feedback)
-                    .map(s => (
+                    .filter(
+                      (s) => s.tutor === currentUser?.fullName && s.feedback
+                    )
+                    .map((s) => (
                       <li key={s.id} style={{ marginBottom: 12 }}>
-                        <strong>{s.student}</strong> ({s.subject} on {s.date}):  
-                        <p style={{ marginTop: 4, fontStyle: "italic" }}>{s.feedback}</p>
+                        <strong>{s.student}</strong> ({s.subject} on {s.date}):
+                        <p style={{ marginTop: 4, fontStyle: "italic" }}>
+                          {s.feedback}
+                        </p>
                       </li>
                     ))}
                 </ul>
@@ -602,7 +1008,12 @@ export default function Dashboard() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Upload Materials</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <form
@@ -610,7 +1021,10 @@ export default function Dashboard() {
                   e.preventDefault();
 
                   simulateTutorAction("upload_material");
-                  setTutorEarnings(prev => ({ ...prev, upload_material: prev.upload_material + 15 }));
+                  setTutorEarnings((prev) => ({
+                    ...prev,
+                    upload_material: prev.upload_material + 15,
+                  }));
 
                   addActivity("Uploaded new study material", "upload");
 
@@ -618,12 +1032,10 @@ export default function Dashboard() {
                   setSelectedAction("");
                 }}
               >
-                <input
-                  type="file"
-                  required
-                  style={{ marginBottom: "10px" }}
-                />
-                <button type="submit" className="action-btn primary">Upload</button>
+                <input type="file" required style={{ marginBottom: "10px" }} />
+                <button type="submit" className="action-btn primary">
+                  Upload
+                </button>
               </form>
             </div>
           </div>
@@ -636,7 +1048,10 @@ export default function Dashboard() {
             <LessonPage
               onFinish={(action) => {
                 simulateTutorAction(action);
-                setTutorEarnings(prev => ({ ...prev, session: prev.session + 20 }));
+                setTutorEarnings((prev) => ({
+                  ...prev,
+                  session: prev.session + 20,
+                }));
 
                 addActivity("Conducted a tutoring session", "session");
 
@@ -652,11 +1067,18 @@ export default function Dashboard() {
         <div className="modal-overlay" onClick={() => setSelectedAction("")}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{role === "student" ? "My Schedule" : "Teaching Schedule"}</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <h3>
+                {role === "student" ? "My Schedule" : "Teaching Schedule"}
+              </h3>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
-              {sessions.filter(s =>
+              {sessions.filter((s) =>
                 role === "student"
                   ? s.student === currentUser?.fullName
                   : s.tutor === currentUser?.fullName
@@ -665,15 +1087,18 @@ export default function Dashboard() {
               ) : (
                 <ul>
                   {sessions
-                    .filter(s =>
+                    .filter((s) =>
                       role === "student"
                         ? s.student === currentUser?.fullName
                         : s.tutor === currentUser?.fullName
                     )
-                    .map(s => (
+                    .map((s) => (
                       <li key={s.id} style={{ marginBottom: 8 }}>
-                        <strong>{s.subject}</strong> with <em>{role === "student" ? s.tutor : s.student}</em><br />
-                        Date: {s.date} | Time: {s.time} | Type: {s.type} | Status: {s.status}
+                        <strong>{s.subject}</strong> with{" "}
+                        <em>{role === "student" ? s.tutor : s.student}</em>
+                        <br />
+                        Date: {s.date} | Time: {s.time} | Type: {s.type} |
+                        Status: {s.status}
                       </li>
                     ))}
                 </ul>
@@ -688,14 +1113,25 @@ export default function Dashboard() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>My Earnings</h3>
-              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedAction("")}
+              >
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <ul>
                 <li>📅 Sessions Conducted: {tutorEarnings.session} coins</li>
-                <li>📤 Materials Uploaded: {tutorEarnings.upload_material} coins</li>
-                <li>👍 Positive Ratings: {tutorEarnings.positive_rating} coins</li>
-                <li>🔥 Consistency Bonus: {tutorEarnings.consistency_bonus} coins</li>
+                <li>
+                  📤 Materials Uploaded: {tutorEarnings.upload_material} coins
+                </li>
+                <li>
+                  👍 Positive Ratings: {tutorEarnings.positive_rating} coins
+                </li>
+                <li>
+                  🔥 Consistency Bonus: {tutorEarnings.consistency_bonus} coins
+                </li>
                 <li>💬 Student Engagement: {tutorEarnings.engagement} coins</li>
               </ul>
               <p>
@@ -704,7 +1140,10 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="modal-footer">
-              <button className="action-btn primary" onClick={() => setSelectedAction("")}>
+              <button
+                className="action-btn primary"
+                onClick={() => setSelectedAction("")}
+              >
                 Close
               </button>
             </div>
@@ -717,7 +1156,9 @@ export default function Dashboard() {
           <div className="ai-container">
             <div className="ai-header">
               <span>AI Assistant 🤖</span>
-              <button className="ai-close-btn" onClick={() => setAiOpen(false)}>✕</button>
+              <button className="ai-close-btn" onClick={() => setAiOpen(false)}>
+                ✕
+              </button>
             </div>
             <div className="ai-messages">
               {aiMessages.map((msg, idx) => (
@@ -733,11 +1174,15 @@ export default function Dashboard() {
                 placeholder="Ask me..."
                 className="ai-input"
               />
-              <button type="submit" className="action-btn primary">Send</button>
+              <button type="submit" className="action-btn primary">
+                Send
+              </button>
             </form>
           </div>
         ) : (
-          <button className="ai-float-btn" onClick={() => setAiOpen(true)}>🤖</button>
+          <button className="ai-float-btn" onClick={() => setAiOpen(true)}>
+            🤖
+          </button>
         )}
       </div>
     </div>

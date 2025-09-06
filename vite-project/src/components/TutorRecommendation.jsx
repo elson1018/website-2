@@ -19,7 +19,9 @@ export default function TutorRecommendation({ tutors }) {
           {recommended.map((tutor) => (
             <div key={tutor.id} className="tutor-card">
               <div className="tutor-header">
-                <div className="avatar" aria-hidden>👨‍🏫</div>
+                <div className="avatar" aria-hidden>
+                  👨‍🏫
+                </div>
                 <div>
                   <div className="tutor-name">{tutor.name}</div>
                   <div className="tutor-subject">{tutor.subject}</div>
@@ -28,6 +30,10 @@ export default function TutorRecommendation({ tutors }) {
               <div className="tutor-meta">
                 <span>Experience: {tutor.experience} yrs</span>
                 <span className="rating">⭐ {tutor.rating}</span>
+              </div>
+              <div className="tutor-price">
+                <span className="price-label">Price per hour:</span>
+                <span className="price-amount">${tutor.price}</span>
               </div>
             </div>
           ))}

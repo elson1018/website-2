@@ -25,6 +25,7 @@
   opacity: 0.9;
   max-width: 600px;
   margin: 0 auto;
+  font-weight: 600;
 }
 
 .about-story {
@@ -41,6 +42,7 @@
   font-size: 2.5rem;
   color: #1e293b;
   margin-bottom: 1.5rem;
+  font-weight: 800;
 }
 
 .story-content p {
@@ -48,6 +50,7 @@
   color: #475569;
   line-height: 1.7;
   margin-bottom: 1.5rem;
+  font-weight: 600;
 }
 
 .story-stats {
@@ -73,7 +76,7 @@
 
 .stat p {
   color: #64748b;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .about-values {
@@ -86,6 +89,7 @@
   font-size: 2.5rem;
   color: #1e293b;
   margin-bottom: 3rem;
+  font-weight: 800;
 }
 
 .values-grid {
@@ -116,11 +120,13 @@
   color: #1e293b;
   margin-bottom: 1rem;
   font-size: 1.3rem;
+  font-weight: 800;
 }
 
 .value-card p {
   color: #64748b;
   line-height: 1.6;
+  font-weight: 600;
 }
 
 .about-team {
@@ -133,6 +139,7 @@
   font-size: 2.5rem;
   color: #1e293b;
   margin-bottom: 3rem;
+  font-weight: 800;
 }
 
 .team-grid {
@@ -165,43 +172,45 @@
   color: #1e293b;
   margin-bottom: 0.5rem;
   font-size: 1.3rem;
+  font-weight: 800;
 }
 
 .member-role {
   color: #3b82f6;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .member-bio {
   color: #64748b;
   line-height: 1.6;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
   .about-hero h1 {
     font-size: 2.5rem;
   }
-  
+
   .about-hero p {
     font-size: 1.1rem;
   }
-  
+
   .about-story {
     grid-template-columns: 1fr;
     text-align: center;
     padding: 2rem 1rem;
   }
-  
+
   .story-content h2 {
     font-size: 2rem;
   }
-  
+
   .about-values h2,
   .about-team h2 {
     font-size: 2rem;
   }
-  
+
   .values-grid,
   .team-grid {
     grid-template-columns: 1fr;

@@ -11,16 +11,7 @@ export default function Footer() {
           <h3>NaiNaiLong</h3>
           <p>Building the future, one app at a time. Join us on this amazing journey.</p>
         </div>
-        
-        <div className="footer-section">
-          <h4>Product</h4>
-          <ul>
-            <li><Link to="/features">Features</Link></li>
-            <li><Link to="/pricing">Pricing</Link></li>
-            <li><Link to="/integrations">Integrations</Link></li>
-            <li><Link to="/roadmap">Roadmap</Link></li>
-          </ul>
-        </div>
+      
         
         <div className="footer-section">
           <h4>Company</h4>

@@ -12,11 +12,13 @@
   font-size: 2.5rem;
   color: #1e293b;
   margin-bottom: 1rem;
+  font-weight: 800;
 }
 
 .features-header p {
   font-size: 1.2rem;
   color: #64748b;
+  font-weight: 600;
 }
 
 .features-grid {
@@ -60,13 +62,14 @@
   color: #1e293b;
   font-size: 1.3rem;
   margin-bottom: 0.8rem;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .feature-description {
   color: #64748b;
   margin-bottom: 1rem;
   line-height: 1.6;
+  font-weight: 600;
 }
 
 .feature-details {
@@ -84,6 +87,7 @@
   color: #475569;
   line-height: 1.6;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .features-indicators {
@@ -115,11 +119,11 @@
   .features {
     padding: 2rem 1rem;
   }
-  
+
   .features-header h2 {
     font-size: 2rem;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;

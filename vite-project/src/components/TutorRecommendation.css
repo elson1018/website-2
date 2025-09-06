@@ -1,7 +1,7 @@
 .recommendation-panel {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 20px;
   margin-bottom: 24px;
 }
@@ -28,7 +28,7 @@
 
 .tutor-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .tutor-header {
@@ -69,4 +69,27 @@
 .tutor-meta .rating {
   font-weight: 600;
   color: #f59e0b;
+}
+
+.tutor-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.price-label {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.price-amount {
+  color: #059669;
+  font-size: 1.1rem;
+  font-weight: 800;
 }

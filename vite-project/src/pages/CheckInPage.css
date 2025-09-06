@@ -4,8 +4,15 @@
   margin: 0 auto;
 }
 
-.checkin-header { display: flex; align-items: center; gap: 12px; }
-.checkin-sub { color: #64748b; }
+.checkin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.checkin-sub {
+  color: #64748b;
+  font-weight: 600;
+}
 
 .streak-grid {
   margin-top: 16px;
@@ -20,11 +27,19 @@
   border-radius: 12px;
   padding: 10px 8px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   color: #64748b;
 }
-.streak-day.checked { background: #e0eaff; color: #1e40af; border-color: #c7d2fe; }
-.streak-day .big { display: block; font-size: 1.25rem; color: #0f172a; }
+.streak-day.checked {
+  background: #e0eaff;
+  color: #1e40af;
+  border-color: #c7d2fe;
+}
+.streak-day .big {
+  display: block;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
 
 .progress {
   margin-top: 16px;
@@ -34,9 +49,18 @@
   overflow: hidden;
   height: 12px;
 }
-.progress > div { height: 100%; background: #22c55e; width: 0%; transition: width .6s ease; }
+.progress > div {
+  height: 100%;
+  background: #22c55e;
+  width: 0%;
+  transition: width 0.6s ease;
+}
 
-.hint { margin-top: 10px; color: #334155; }
+.hint {
+  margin-top: 10px;
+  color: #334155;
+  font-weight: 600;
+}
 
 .confetti {
   position: relative;
@@ -52,8 +76,15 @@
 }
 
 @keyframes fall {
-  0% { opacity: 0; transform: translate(-50%, -10px) rotate(0deg); }
-  50% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, 60px) rotate(360deg); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -10px) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 60px) rotate(360deg);
+  }
 }
-
