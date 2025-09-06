@@ -1,16 +1,67 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCoins } from "../context/CoinContext.jsx";
-import LessonPage from "./LessonPage"; // adjust path
+import LessonPage from "../pages/LessonPage.jsx";
 import "./Dashboard.css";
 
 export default function Dashboard() {
+  const rawUser = localStorage.getItem("auth-user");
+  const currentUser = rawUser ? JSON.parse(rawUser) : null;
+
   const { role, setRole, studentCoins, tutorCoins, simulateStudentAction, simulateTutorAction, streaks } = useCoins();
 
   const ran = useRef(false);
   const navigate = useNavigate();
 
   const [hasLoggedInToday, setHasLoggedInToday] = useState(false);
+
+  const addActivity = (actionText, type = "user") => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setRecentActivity(prev => [
+      { id: prev.length + 1, action: actionText, time: timeString, type },
+      ...prev
+    ]);
+  };
+
+  const [tutorEarnings, setTutorEarnings] = useState({
+    session: 0,
+    upload_material: 0,
+    positive_rating: 0,
+    consistency_bonus: 0,
+    engagement: 0,
+  });
+
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiInput, setAiInput] = useState("");
+  const [aiMessages, setAiMessages] = useState([]);
+
+  const handleAiSend = (e) => {
+    e.preventDefault();
+    if (!aiInput.trim()) return;
+
+    setAiMessages(prev => [...prev, { type: "user", text: aiInput }]);
+
+    setTimeout(() => {
+      setAiMessages(prev => [...prev, { type: "ai", text: "🤖 Here's a helpful tip for you!" }]);
+    }, 800);
+
+    setAiInput("");
+  };
+
+  const [sessions, setSessions] = useState([
+    {
+    id: 1,
+    tutor: "Alice Tan",
+    student: "Elson",
+    subject: "Math",
+    date: "2025-09-06",
+    time: "15:00",
+    type: "live",
+    status: "completed",
+    feedback: null,
+    }
+  ]);
 
   useEffect(() => {
     const lastLogin = localStorage.getItem("last-daily-login");
@@ -21,17 +72,21 @@ export default function Dashboard() {
   }, []);
 
   const handleDailyLogin = () => {
-    const raw = localStorage.getItem("auth-user");
-    if (!raw) { 
-      alert("Please log in to perform this action."); 
-      return; 
+    const today = new Date().toDateString();
+    const lastLogin = localStorage.getItem("last-daily-login");
+
+    if (lastLogin === today) {
+      alert("You've already checked in today!");
+      return;
     }
 
-    const today = new Date().toDateString();
-    localStorage.setItem("last-daily-login", today); // save today as last login
-    setHasLoggedInToday(true); // disable button after click
+    localStorage.setItem("last-daily-login", today);
+    setHasLoggedInToday(true); // disable button
 
-    simulateStudentAction("daily_login");
+    simulateStudentAction("daily_login"); // updates coins + streaks
+
+    addActivity("Checked in for daily login", "user");
+
     alert("🎉 Daily login successful! Coins awarded.");
   };
 
@@ -80,14 +135,8 @@ export default function Dashboard() {
         users: 1247,      // total users on platform
         tutors: 320,      // number of tutors
         sessions: 156,    // tutoring sessions this month
-        satisfaction: 95  // satisfaction rate %
+        satisfaction: 95  // satisfaction rate 
       });
-      
-      setRecentActivity([
-        { id: 1, action: "Student Alice booked a Math session", time: "2 minutes ago", type: "session" },
-        { id: 2, action: "Tutor Benjamin uploaded new Physics materials", time: "1 hour ago", type: "upload" },
-        { id: 3, action: "Carmen earned +20 coins for great feedback", time: "3 hours ago", type: "coins" }
-      ]);
       
       setIsLoading(false);
     }, 1500);
@@ -127,11 +176,15 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h2>Welcome back! 👋</h2>
-        <p>Here's what's happening with your projects today</p>
+        <h2>Welcome back, {currentUser?.fullName || "Learner"}! 👋</h2>
+        <p>Check your upcoming sessions, achievements, and rewards for today 📚✨</p>
         <div className="role-bar">
           <label className="role-label">Role:</label>
-          <select className="role-select" value={role} onChange={(e) => setRole(e.target.value)}>
+          <select
+            className="role-select"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
             <option value="student">Student</option>
             <option value="tutor">Tutor</option>
           </select>
@@ -222,17 +275,48 @@ export default function Dashboard() {
 
             {role === "student" ? (
               <div className="action-buttons">
-                <button className="action-btn primary">🔍 Find a Tutor</button>
-                <button className="action-btn secondary">📅 Book a Session</button>
-                <button className="action-btn secondary">📚 View Assignments</button>
-                <button className="action-btn secondary">💰 Redeem Rewards</button>
+                <button 
+                  className="action-btn primary"
+                  onClick={() => {
+                  navigate("/dashboard#tutors"); 
+                }}
+                >🔍 Find a Tutor</button>
+                <button
+                  className="action-btn secondary"
+                  onClick={() => setAiOpen(true)}
+                >
+                  🤖 AI Assistant
+                </button>
+                <button 
+                  className="action-btn secondary"
+                  onClick={() => setSelectedAction("assignments")}
+                >📚 View Assignments</button>
+                <button 
+                  className="action-btn secondary"
+                  onClick={() => navigate("/rewards")}
+                >
+                  💰 Redeem Rewards
+                </button>
+                <button
+                  className="action-btn secondary"
+                  onClick={() => setSelectedAction("view_schedule")}
+                >
+                  🗓 My Schedule
+                </button>
               </div>
             ) : (
               <div className="action-buttons">
-                <button className="action-btn primary">📅 Start a Session</button>
-                <button className="action-btn secondary">📤 Upload Materials</button>
-                <button className="action-btn secondary">📊 View Earnings</button>
-                <button className="action-btn secondary">💬 Respond to Feedback</button>
+                <button className="action-btn primary" onClick={() => setSelectedAction("conduct_session")}>📅 Start a Session</button>
+                <button className="action-btn secondary" onClick={() => setAiOpen(true)}>🤖 AI Assistant</button>
+                <button className="action-btn secondary" onClick={() => setSelectedAction("upload_material")}>📤 Upload Materials</button>
+                <button className="action-btn secondary" onClick={() => setSelectedAction("view_earnings")}>📊 View Earnings</button>
+                <button className="action-btn secondary" onClick={() => setSelectedAction("respond_feedback")}>💬 Respond to Feedback</button>
+                <button
+                  className="action-btn secondary"
+                  onClick={() => setSelectedAction("view_schedule")}
+                >
+                  🗓 My Teaching Schedule
+                </button>
               </div>
             )}
 
@@ -279,8 +363,8 @@ export default function Dashboard() {
               <button className="action-btn primary" onClick={() => setSelectedAction("conduct_session")}>
                 Conduct a tutoring session
               </button>
-              <button className="action-btn secondary" onClick={() => setSelectedAction("positive_rating")}>
-                Receive positive rating
+              <button className="action-btn secondary" onClick={() => setSelectedAction("respond_feedback")}>
+                View Student Feedback
               </button>
               <button className="action-btn secondary" onClick={() => setSelectedAction("consistency_bonus")}>
                 Consistency bonus
@@ -350,10 +434,27 @@ export default function Dashboard() {
                     return;
                   }
 
-                  alert(`You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`);
+                  const user = JSON.parse(raw);
+
+                  setSessions(prev => [
+                    ...prev,
+                    {
+                      id: prev.length + 1,
+                      tutor: selectedTutor.name,
+                      student: user.fullName,
+                      subject: selectedTutor.subject,
+                      date: new Date().toISOString().split("T")[0],
+                      time: "15:00",
+                      type: "live",
+                      status: "upcoming"
+                    }
+                  ]);
 
                   simulateStudentAction("attend_session");
 
+                  addActivity(`You joined ${selectedTutor.name}'s ${selectedTutor.subject} class`, "session");
+
+                  alert(`You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`);
                   setSelectedTutor(null);
                 }}
               >
@@ -387,12 +488,13 @@ export default function Dashboard() {
                           const raw = localStorage.getItem("auth-user");
                           if (!raw) { alert("Please log in to perform this action."); return; }
 
-                          // mark as completed
                           setAssignments(prev =>
                             prev.map(x => x.id === a.id ? { ...x, completed: true } : x)
                           );
 
                           simulateStudentAction("complete_assignment");
+
+                          addActivity(`Completed assignment: ${a.title}`, "assignment");
 
                           alert(`🎉 You completed ${a.title} and earned coins!`);
                         }}
@@ -417,43 +519,95 @@ export default function Dashboard() {
             </div>
 
             <div className="modal-body">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const raw = localStorage.getItem("auth-user");
-                  if (!raw) { alert("Please log in to perform this action."); return; }
+              {sessions.filter(s => s.student === currentUser?.fullName).length === 0 ? (
+                <p>⚠️ You need to attend a class before giving feedback.</p>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const raw = localStorage.getItem("auth-user");
+                    if (!raw) { alert("Please log in first."); return; }
 
-                  simulateStudentAction("give_feedback");
-                  alert("🎉 Thank you for your valuable feedback! Coins awarded.");
-                  setSelectedAction("");
-                }}
-              >
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <textarea
-                  required
-                  placeholder="Write your feedback here..."
-                  style={{
-                    width: "80%",          // smaller width than 100%
-                    minHeight: "100px",
-                    padding: "8px",
-                    borderRadius: "8px",
-                    border: "1px solid #ccc",
-                    marginBottom: "12px",
-                    resize: "vertical",
+                    const formData = new FormData(e.target);
+                    const sessionId = formData.get("session");
+                    const feedback = formData.get("feedback");
+
+                    setSessions(prev =>
+                      prev.map(s =>
+                        s.id.toString() === sessionId
+                          ? { ...s, feedback }
+                          : s
+                      )
+                    );
+
+                    simulateStudentAction("give_feedback");
+                    addActivity("Submitted feedback for a tutor", "feedback");
+
+                    alert("🎉 Feedback submitted successfully! Coins awarded.");
+                    setSelectedAction("");
                   }}
-                />
-              </div>
+                >
+                  <label>Select a Tutor:</label>
+                  <select name="session" required>
+                    {sessions
+                      .filter(s => s.student === currentUser?.fullName && !s.feedback)
+                      .map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.subject} with {s.tutor} ({s.date})
+                        </option>
+                      ))}
+                  </select>
 
-                <button type="submit" className="action-btn primary">
-                  Submit Feedback
-                </button>
-              </form>
+                  <textarea
+                    name="feedback"
+                    required
+                    placeholder="Write your feedback here..."
+                    style={{
+                      width: "100%",
+                      minHeight: "100px",
+                      padding: "8px",
+                      borderRadius: "8px",
+                      marginTop: "12px",
+                    }}
+                  />
+
+                  <button type="submit" className="action-btn primary" style={{ marginTop: "12px" }}>
+                    Submit Feedback
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      
+      {selectedAction === "respond_feedback" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Student Feedback</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+
+            <div className="modal-body">
+              {sessions.filter(s => s.tutor === currentUser?.fullName && s.feedback).length === 0 ? (
+                <p>No feedback yet.</p>
+              ) : (
+                <ul>
+                  {sessions
+                    .filter(s => s.tutor === currentUser?.fullName && s.feedback)
+                    .map(s => (
+                      <li key={s.id} style={{ marginBottom: 12 }}>
+                        <strong>{s.student}</strong> ({s.subject} on {s.date}):  
+                        <p style={{ marginTop: 4, fontStyle: "italic" }}>{s.feedback}</p>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedAction === "upload_material" && (
         <div className="modal-overlay" onClick={() => setSelectedAction("")}>
@@ -466,7 +620,12 @@ export default function Dashboard() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+
                   simulateTutorAction("upload_material");
+                  setTutorEarnings(prev => ({ ...prev, upload_material: prev.upload_material + 15 }));
+
+                  addActivity("Uploaded new study material", "upload");
+
                   alert("📤 Materials uploaded successfully! Coins awarded.");
                   setSelectedAction("");
                 }}
@@ -482,6 +641,117 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {selectedAction === "conduct_session" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <LessonPage
+              onFinish={(action) => {
+                simulateTutorAction(action);
+                setTutorEarnings(prev => ({ ...prev, session: prev.session + 20 }));
+
+                addActivity("Conducted a tutoring session", "session");
+
+                alert("🎉 Coins awarded for conducting the session!");
+                setSelectedAction("");
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {selectedAction === "view_schedule" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{role === "student" ? "My Schedule" : "Teaching Schedule"}</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+            <div className="modal-body">
+              {sessions.filter(s =>
+                role === "student"
+                  ? s.student === currentUser?.fullName
+                  : s.tutor === currentUser?.fullName
+              ).length === 0 ? (
+                <p>No sessions scheduled.</p>
+              ) : (
+                <ul>
+                  {sessions
+                    .filter(s =>
+                      role === "student"
+                        ? s.student === currentUser?.fullName
+                        : s.tutor === currentUser?.fullName
+                    )
+                    .map(s => (
+                      <li key={s.id} style={{ marginBottom: 8 }}>
+                        <strong>{s.subject}</strong> with <em>{role === "student" ? s.tutor : s.student}</em><br />
+                        Date: {s.date} | Time: {s.time} | Type: {s.type} | Status: {s.status}
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedAction === "view_earnings" && (
+        <div className="modal-overlay" onClick={() => setSelectedAction("")}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>My Earnings</h3>
+              <button className="modal-close" onClick={() => setSelectedAction("")}>✕</button>
+            </div>
+            <div className="modal-body">
+              <ul>
+                <li>📅 Sessions Conducted: {tutorEarnings.session} coins</li>
+                <li>📤 Materials Uploaded: {tutorEarnings.upload_material} coins</li>
+                <li>👍 Positive Ratings: {tutorEarnings.positive_rating} coins</li>
+                <li>🔥 Consistency Bonus: {tutorEarnings.consistency_bonus} coins</li>
+                <li>💬 Student Engagement: {tutorEarnings.engagement} coins</li>
+              </ul>
+              <p>
+                <strong>Total Coins Earned: </strong>
+                {Object.values(tutorEarnings).reduce((a, b) => a + b, 0)}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="action-btn primary" onClick={() => setSelectedAction("")}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`ai-assistant ${aiOpen ? "open" : "collapsed"}`}>
+        {aiOpen ? (
+          <div className="ai-container">
+            <div className="ai-header">
+              <span>AI Assistant 🤖</span>
+              <button className="ai-close-btn" onClick={() => setAiOpen(false)}>✕</button>
+            </div>
+            <div className="ai-messages">
+              {aiMessages.map((msg, idx) => (
+                <div key={idx} className={`ai-message ${msg.type}`}>
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+            <form className="ai-input-form" onSubmit={handleAiSend}>
+              <input
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                placeholder="Ask me..."
+                className="ai-input"
+              />
+              <button type="submit" className="action-btn primary">Send</button>
+            </form>
+          </div>
+        ) : (
+          <button className="ai-float-btn" onClick={() => setAiOpen(true)}>🤖</button>
+        )}
+      </div>
     </div>
   );
 }

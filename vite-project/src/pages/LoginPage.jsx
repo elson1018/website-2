@@ -16,9 +16,8 @@ export default function LoginPage() {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
         ...prev,
-      [name]: type === 'checkbox' ? checked : value
+        [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
@@ -26,40 +25,44 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
     }
-    
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     setIsLoading(true);
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const userData = {
-        email: formData.email,
-        fullName: formData.email.split('@')[0], // Use email prefix as name
-        role: 'student' // Default role
-      };
-      
-      localStorage.setItem('auth-user', JSON.stringify(userData));
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Get stored users from localStorage
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+
+      // Check if user exists
+      const user = users.find(u => u.email === formData.email && u.password === formData.password);
+
+      if (!user) {
+        setErrors({ email: "Invalid email or password" });
+        return;
+      }
+
+      // Save logged-in user
+      localStorage.setItem("auth-user", JSON.stringify(user));
+
+      // Redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);

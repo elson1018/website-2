@@ -23,7 +23,6 @@ export default function SignupPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
@@ -36,82 +35,86 @@ export default function SignupPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
     } else if (formData.fullName.trim().length < 2) {
       newErrors.fullName = "Full name must be at least 2 characters";
     }
-    
+
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
     }
-    
+
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     if (!formData.role) {
       newErrors.role = "Please choose a role";
     }
-    
+
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = "You must agree to the terms and conditions";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    
-    // Simulate API call
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Get existing users
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+
+      // Check if email already exists
+      if (users.some(u => u.email === formData.email)) {
+        setErrors({ email: "An account with this email already exists" });
+        return;
+      }
+
+      const newUser = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role
+      };
+
+      // Save user in localStorage
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      // Set role in context
       setRole(formData.role);
-      
-      // For demo purposes, just redirect to home
-      // In a real app, you'd handle account creation here
-      navigate("/check-in");
+
+      // Optionally, add initial coins
+      if (formData.role === "student") addStudentCoins(100);
+      else addTutorCoins(150);
+
+      // Set logged-in user
+      localStorage.setItem("auth-user", JSON.stringify(newUser));
+
+      // Navigate to dashboard
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createDemoAccount = async (demoRole = "student") => {
-    try {
-      setIsLoading(true);
-      const demoUser = {
-        fullName: demoRole === "student" ? "Demo Student" : "Demo Tutor",
-        email: demoRole === "student" ? "student.demo@example.com" : "tutor.demo@example.com",
-        role: demoRole
-      };
-      localStorage.setItem("auth-user", JSON.stringify(demoUser));
-      setRole(demoRole);
-      if (demoRole === "student") {
-        addStudentCoins(120);
-      } else {
-        addTutorCoins(220);
-      }
-      await new Promise(resolve => setTimeout(resolve, 600));
-      navigate("/dashboard");
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +151,7 @@ export default function SignupPage() {
             </div>
             {errors.role && <span className="error-message">{errors.role}</span>}
           </div>
+
           <div className="form-group">
             <label htmlFor="fullName">Full Name</label>
             <input
@@ -207,7 +211,7 @@ export default function SignupPage() {
             />
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
           </div>
-          
+
           <div className="form-group">
             <label className="checkbox-label">
               <input
@@ -233,27 +237,7 @@ export default function SignupPage() {
             {isLoading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
-        <div style={{ marginTop: "0.75rem" }}>
-          <button
-            type="button"
-            className="signup-submit"
-            style={{ background: '#6b7280' }}
-            onClick={() => createDemoAccount('student')}
-            disabled={isLoading}
-          >
-            {isLoading ? "Setting up Demo..." : "Create Demo Account (Student)"}
-          </button>
-          <button
-            type="button"
-            className="signup-submit"
-            style={{ marginTop: '0.5rem', background: '#475569' }}
-            onClick={() => createDemoAccount('tutor')}
-            disabled={isLoading}
-          >
-            {isLoading ? "Setting up Demo..." : "Create Demo Account (Tutor)"}
-          </button>
-        </div>
-        
+
         <div className="signup-footer">
           <p>
             Already have an account? <Link to="/login">Sign in</Link>

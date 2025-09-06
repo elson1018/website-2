@@ -1,41 +1,65 @@
 import { useCoins } from "../context/CoinContext.jsx";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./RewardsPage.css";
 
 export default function RewardsPage() {
-  const { role, setRole, studentCoins, tutorCoins, spendStudentCoins, spendTutorCoins, simulateStudentAction, simulateTutorAction } = useCoins();
-  const navigate = useNavigate();
-  const [lastAction, setLastAction] = useState("");
-  const [history, setHistory] = useState([]);
+  const { role, setRole, studentCoins, tutorCoins, spendStudentCoins, spendTutorCoins, streaks, simulateStudentAction } = useCoins();
+  const [redeemed, setRedeemed] = useState([]);
+  const [hasCheckedIn, setHasCheckedIn] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("action-history");
-      setHistory(raw ? JSON.parse(raw) : []);
-    } catch { setHistory([]); }
+    const lastLogin = localStorage.getItem("last-daily-login");
+    if (lastLogin === new Date().toDateString()) {
+      setHasCheckedIn(true);
+    }
   }, []);
 
-  const recordAction = (label) => {
-    setLastAction(label);
-    const entry = { label, role, ts: new Date().toISOString() };
-    const next = [entry, ...history].slice(0, 6);
-    setHistory(next);
-    try { localStorage.setItem("action-history", JSON.stringify(next)); } catch {}
+  useEffect(() => {
+    const raw = localStorage.getItem("redeemed-items");
+    setRedeemed(raw ? JSON.parse(raw) : []);
+  }, []);
+
+  // Handle check-in
+  const handleCheckIn = () => {
+  const today = new Date().toDateString();
+  const lastLogin = localStorage.getItem("last-daily-login");
+
+  if (lastLogin === today) {
+    alert("You've already checked in today!");
+    return;
+  }
+
+  localStorage.setItem("last-daily-login", today);
+  setHasCheckedIn(true);
+
+  simulateStudentAction("daily_login");
+
+  alert("🎉 Checked in! Coins awarded.");
+};
+
+  // Handle redeem
+  const handleRedeem = (amount, label) => {
+    if (role === "student" && studentCoins >= amount) {
+      spendStudentCoins(amount);
+    } else if (role === "tutor" && tutorCoins >= amount) {
+      spendTutorCoins(amount);
+    } else {
+      alert("Not enough coins!");
+      return;
+    }
+
+    const next = [{ label, ts: new Date().toLocaleString() }, ...redeemed];
+    setRedeemed(next);
+    localStorage.setItem("redeemed-items", JSON.stringify(next));
+    alert(`🎉 Successfully redeemed ${label}!`);
   };
 
-  const requireAuth = (onAuthed) => {
-    try {
-      const raw = localStorage.getItem("auth-user");
-      if (raw) return onAuthed();
-    } catch {}
-    alert("Please log in to perform this action.");
-    navigate("/login");
-  };
+  // Get coins for current role
+  const coins = role === "student" ? studentCoins : tutorCoins;
 
   return (
     <div className="rewards-page">
-      <h1>Coin Rewards</h1>
+      <h1>My Rewards</h1>
 
       <div className="rewards-header">
         <span>Viewing as:</span>
@@ -43,147 +67,96 @@ export default function RewardsPage() {
           <option value="student">Student</option>
           <option value="tutor">Tutor</option>
         </select>
+
         <div className="spacer balances">
-          <span className="balance-pill student">Student: {studentCoins}</span>
-          <span className="balance-pill tutor">Tutor: {tutorCoins}</span>
+          <span className="balance-pill">{role === "student" ? "Student" : "Tutor"} Coins: {coins}</span>
         </div>
       </div>
 
-      <section className="rewards-section">
-        <h2>Earning Actions</h2>
-        {role === "student" ? (
-          <div className="actions-row">
-            <button className="btn primary" onClick={() => requireAuth(() => { navigate("/dashboard#tutors"); recordAction("Navigate to Find Your Tutor"); })}>Attend a tutoring session</button>
-            <button className="btn" onClick={() => requireAuth(() => { navigate("/assignments"); recordAction("Navigate to Assignments"); })}>Complete assignment/quiz</button>
-            <button className="btn" onClick={() => requireAuth(() => { navigate("/feedback"); recordAction("Navigate to Feedback"); })}>Give useful feedback</button>
-            <button className="btn" onClick={() => requireAuth(() => { navigate("/check-in"); recordAction("Navigate to Check-in"); })}>Daily login</button>
-          </div>
-        ) : (
-          <div className="actions-row">
-            <button className="btn primary" onClick={() => requireAuth(() => { simulateTutorAction("conduct_session"); recordAction("Conducted a tutoring session"); })}>Conduct a tutoring session</button>
-            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("positive_rating"); recordAction("Received a positive rating"); })}>Receive positive rating</button>
-            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("consistency_bonus"); recordAction("Consistency bonus achieved"); })}>Consistency bonus</button>
-            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("upload_material"); recordAction("Uploaded extra study materials"); })}>Upload extra materials</button>
-            <button className="btn" onClick={() => requireAuth(() => { simulateTutorAction("student_engagement"); recordAction("Student engagement bonus"); })}>Student engagement bonus</button>
-          </div>
-        )}
-      </section>
+      <div className="check-in-section">
+        <button 
+          className="btn primary" 
+          onClick={handleCheckIn} 
+          disabled={hasCheckedIn}
+        >
+          {hasCheckedIn ? "✅ Checked In" : "Check In"}
+        </button>
 
-      {lastAction && (
-        <div className="rewards-section">
-          <div className="confirm-banner">Action recorded: {lastAction}</div>
+        {/* Streak bar */}
+        <div className="streak-container">
+          <span>Daily Login Streak:</span>
+          <div className="streak-bar">
+            <div
+              className="streak-progress"
+              style={{ width: `${Math.min(streaks.dailyLogin || 0, 7) * (100/7)}%` }}
+            />
+          </div>
+          <span>{streaks.dailyLogin || 0} / 7 days</span>
         </div>
-      )}
 
-      {history.length > 0 && (
-        <section className="rewards-section">
-          <h2>Recent Reward Actions</h2>
-          <ul className="history-list">
-            {history.map((h, i) => (
-              <li key={i} className="history-item">
-                <span className="history-label">{h.label}</span>
-                <span className="history-meta">{h.role} • {new Date(h.ts).toLocaleString()}</span>
+        <div className="streak-reward">
+          <span>Next streak reward: {10 + (streaks.dailyLogin || 0) * 2} coins</span>
+        </div>
+      </div>
+
+      <div className="redeem-section">
+        <h2>Redeem Coins</h2>
+        <div className="redeem-list">
+          {role === "student" ? (
+            <>
+              <div className="redeem-item">
+                <span>50 coins → Small study material</span>
+                <button className="btn" onClick={() => handleRedeem(50, "Small study material")} disabled={coins < 50}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>100 coins → 10% discount on next session</span>
+                <button className="btn" onClick={() => handleRedeem(100, "10% discount")} disabled={coins < 100}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>200 coins → Unlock premium workshop</span>
+                <button className="btn" onClick={() => handleRedeem(200, "Premium workshop")} disabled={coins < 200}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>500 coins → Gift voucher / special badge</span>
+                <button className="btn" onClick={() => handleRedeem(500, "Gift voucher")} disabled={coins < 500}>Redeem</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="redeem-item">
+                <span>100 coins → Highlighted tutor profile (1 week)</span>
+                <button className="btn" onClick={() => handleRedeem(100, "Highlighted profile")} disabled={coins < 100}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>200 coins → Access advanced teaching tools</span>
+                <button className="btn" onClick={() => handleRedeem(200, "Advanced tools")} disabled={coins < 200}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>500 coins → Gift card / small payout</span>
+                <button className="btn" onClick={() => handleRedeem(500, "Gift card")} disabled={coins < 500}>Redeem</button>
+              </div>
+              <div className="redeem-item">
+                <span>1000 coins → Top Tutor badge & profile boost</span>
+                <button className="btn" onClick={() => handleRedeem(1000, "Top Tutor badge")} disabled={coins < 1000}>Redeem</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {redeemed.length > 0 && (
+        <div className="redeemed-section">
+          <h3>Redeemed Items</h3>
+          <ul className="redeemed-list">
+            {redeemed.map((r, i) => (
+              <li key={i} className="redeemed-item">
+                <span>{r.label}</span>
+                <span>{r.ts}</span>
               </li>
             ))}
           </ul>
-        </section>
+        </div>
       )}
-
-      <section className="rewards-section">
-        <h2>How Coins Are Earned</h2>
-        <div className="rewards-grid">
-          <div className="card">
-            <h3>For Students</h3>
-            <ul className="rules-list">
-              <li>Attend a tutoring session → earn coins.</li>
-              <li>Complete assignments/quizzes → earn coins.</li>
-              <li>Give useful feedback → small coin bonus.</li>
-              <li>Consistent attendance (streaks) → extra coins.</li>
-            </ul>
-            <table className="rules-table">
-              <thead>
-                <tr>
-                  <th>Action</th>
-                  <th>Coins</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>Attend a tutoring session</td><td>10</td></tr>
-                <tr><td>Complete assignment/quiz</td><td>15</td></tr>
-                <tr><td>Daily login streak (3+ days)</td><td>5 per day</td></tr>
-                <tr><td>Give useful feedback to tutor</td><td>5</td></tr>
-                <tr><td>Weekly attendance streak</td><td>30</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div className="card">
-            <h3>For Tutors</h3>
-            <ul className="rules-list">
-              <li>Successfully conduct a tutoring session → earn coins.</li>
-              <li>Positive student ratings/reviews → bonus coins.</li>
-              <li>Consistency (teaching regularly without canceling) → extra coins.</li>
-              <li>Preparing extra materials/notes → bonus (optional).</li>
-            </ul>
-            <table className="rules-table">
-              <thead>
-                <tr>
-                  <th>Action</th>
-                  <th>Coins</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>Successfully conduct a tutoring session</td><td>20</td></tr>
-                <tr><td>Receive positive rating (4★ or 5★)</td><td>10</td></tr>
-                <tr><td>Consistent teaching streak</td><td>30</td></tr>
-                <tr><td>Upload extra study material/notes</td><td>15</td></tr>
-                <tr><td>Student engagement bonus (80%+ attendance)</td><td>25</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section className="rewards-section">
-        <h2>How Coins Can Be Spent</h2>
-        <div className="rewards-grid">
-          <div className="card">
-            <h3>Students</h3>
-            <ul className="rules-list">
-              <li>50 coins → Small study material (PDF, notes).</li>
-              <li>100 coins → 10% discount on next session.</li>
-              <li>200 coins → Unlock premium workshop.</li>
-              <li>500 coins → Gift voucher / special badge.</li>
-            </ul>
-            <div className="redeem-actions">
-              <button className="btn" onClick={() => spendStudentCoins(50)} disabled={studentCoins < 50}>Redeem 50</button>
-              <button className="btn" onClick={() => spendStudentCoins(100)} disabled={studentCoins < 100}>Redeem 100</button>
-              <button className="btn" onClick={() => spendStudentCoins(200)} disabled={studentCoins < 200}>Redeem 200</button>
-              <button className="btn" onClick={() => spendStudentCoins(500)} disabled={studentCoins < 500}>Redeem 500</button>
-            </div>
-          </div>
-          <div className="card">
-            <h3>Tutors</h3>
-            <ul className="rules-list">
-              <li>100 coins → Highlighted tutor profile (1 week).</li>
-              <li>200 coins → Access advanced teaching tools.</li>
-              <li>500 coins → Gift card or small payout (if allowed).</li>
-              <li>1000 coins → Top Tutor badge & profile boost.</li>
-            </ul>
-            <div className="redeem-actions">
-              <button className="btn" onClick={() => spendTutorCoins(100)} disabled={tutorCoins < 100}>Redeem 100</button>
-              <button className="btn" onClick={() => spendTutorCoins(200)} disabled={tutorCoins < 200}>Redeem 200</button>
-              <button className="btn" onClick={() => spendTutorCoins(500)} disabled={tutorCoins < 500}>Redeem 500</button>
-              <button className="btn" onClick={() => spendTutorCoins(1000)} disabled={tutorCoins < 1000}>Redeem 1000</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="rewards-section">
-        <p className="note">Note: This is a demo UI. Hook to real events as needed.</p>
-      </section>
     </div>
   );
 }
-
-

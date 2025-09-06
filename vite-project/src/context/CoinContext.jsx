@@ -49,9 +49,10 @@ export function CoinProvider({ children }) {
         addStudentCoins(5);
         break;
       case "daily_login":
+        addStudentCoins(5);
         setStreaks((s) => {
           const next = (s.dailyLogin || 0) + 1;
-          if (next >= 3) addStudentCoins(5);
+          if (next >= 3) addStudentCoins(5); 
           return { ...s, dailyLogin: next };
         });
         break;
