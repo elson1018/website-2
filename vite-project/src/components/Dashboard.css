@@ -239,26 +239,6 @@
   font-weight: 600;
 }
 
-.streak-bar {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
-}
-
-.streak-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.6rem;
-  background: #f1f5f9;
-  border: 1px solid #e5e7eb;
-  border-radius: 9999px;
-}
-
-.streak-label { color: #64748b; font-weight: 600; font-size: 0.85rem; }
-.streak-value { color: #0f172a; font-weight: 800; }
-
 .activity-list {
   display: flex;
   flex-direction: column;

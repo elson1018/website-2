@@ -1,0 +1,28 @@
+.insights-panel {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.insights-panel h3 {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.insights-panel p {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.insights-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.insights-panel strong {
+  font-weight: 600;
+  color: #111;
+}

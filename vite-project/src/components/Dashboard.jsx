@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCoins } from "../context/CoinContext.jsx";
 import LessonPage from "../pages/LessonPage.jsx";
+import TutorRecommendation from "../components/TutorRecommendation.jsx";
+import PerformanceInsights from "../components/PerformanceInsights.jsx";
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -225,34 +227,45 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-content">
-        <div id="tutors" className="tutors-panel">
-          <h3>Find Your Tutor</h3>
-          <div className="tutor-grid">
-            {tutors
-              .filter((t) => {
-                const params = new URLSearchParams(window.location.search);
-                const q = (params.get("q") || "").toLowerCase();
-                if (!q) return true;
-                return t.subject.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
-              })
-              .map(t => (
-              <div key={t.id} className="tutor-card">
-                <div className="tutor-header">
-                  <div className="avatar" aria-hidden>👩‍🏫</div>
-                  <div>
-                    <div className="tutor-name">{t.name}</div>
-                    <div className="tutor-subject">{t.subject}</div>
-                  </div>
-                </div>
-                <div className="tutor-meta">
-                  <span>Experience: {t.experience} yrs</span>
-                  <span className="rating">⭐ {t.rating}</span>
-                </div>
-                <button className="action-btn primary" onClick={() => setSelectedTutor(t)}>Learn More</button>
+        {role === "student" ? (
+          <>
+            <TutorRecommendation tutors={tutors} />
+            <div id="tutors" className="tutors-panel">
+              <h3>Find Your Tutor</h3>
+              <div className="tutor-grid">
+                {tutors
+                  .filter((t) => {
+                    const params = new URLSearchParams(window.location.search);
+                    const q = (params.get("q") || "").toLowerCase();
+                    if (!q) return true;
+                    return t.subject.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
+                  })
+                  .map(t => (
+                    <div key={t.id} className="tutor-card">
+                      <div className="tutor-header">
+                        <div className="avatar" aria-hidden>👩‍🏫</div>
+                        <div>
+                          <div className="tutor-name">{t.name}</div>
+                          <div className="tutor-subject">{t.subject}</div>
+                        </div>
+                      </div>
+                      <div className="tutor-meta">
+                        <span>Experience: {t.experience} yrs</span>
+                        <span className="rating">⭐ {t.rating}</span>
+                      </div>
+                      <button className="action-btn primary" onClick={() => setSelectedTutor(t)}>Learn More</button>
+                    </div>
+                  ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <PerformanceInsights sessions={sessions} currentUser={currentUser} />
+            <div> </div>
+          </>
+        )}
+
         <div className="recent-activity">
           <h3>Recent Activity</h3>
           <div className="activity-list">
@@ -366,34 +379,9 @@ export default function Dashboard() {
               <button className="action-btn secondary" onClick={() => setSelectedAction("respond_feedback")}>
                 View Student Feedback
               </button>
-              <button className="action-btn secondary" onClick={() => setSelectedAction("consistency_bonus")}>
-                Consistency bonus
-              </button>
               <button className="action-btn secondary" onClick={() => setSelectedAction("upload_material")}>
                 📤 Upload Materials
-              </button>
-              <button className="action-btn secondary" onClick={() => setSelectedAction("student_engagement")}>
-                Student engagement bonus
-              </button>
-            </div>
-          )}
-          {role === "student" ? (
-            <div className="streak-bar">
-              <span className="streak-item">
-                <span className="streak-label">Daily Login Streak</span>
-                <span className="streak-value">{streaks.dailyLogin || 0}</span>
-              </span>
-              <span className="streak-item">
-                <span className="streak-label">Weekly Attendance</span>
-                <span className="streak-value">{streaks.weeklyAttendance || 0}</span>
-              </span>
-            </div>
-          ) : (
-            <div className="streak-bar">
-              <span className="streak-item">
-                <span className="streak-label">Tutor Consistency Streak</span>
-                <span className="streak-value">{streaks.tutorConsistency || 0}</span>
-              </span>
+            </button>
             </div>
           )}
         </div>
