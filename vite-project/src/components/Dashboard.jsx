@@ -127,14 +127,23 @@ export default function Dashboard() {
 
       // Search query filter
       if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesName = tutor.name.toLowerCase().includes(query);
-        const matchesSubject = tutor.subject.toLowerCase().includes(query);
-        const matchesDescription = tutor.description
-          .toLowerCase()
-          .includes(query);
+        const query = filters.searchQuery.toLowerCase().trim();
+        const searchTerms = query.split(' ').filter(term => term.length > 0);
+        
+        // Check if any search term matches any field
+        const matchesAnyTerm = searchTerms.some(term => {
+          const matchesName = tutor.name.toLowerCase().includes(term);
+          const matchesSubject = tutor.subject.toLowerCase().includes(term);
+          const matchesDescription = tutor.description.toLowerCase().includes(term);
+          const matchesPrice = tutor.price.toString().includes(term);
+          const matchesExperience = tutor.experience.toString().includes(term);
+          const matchesRating = tutor.rating.toString().includes(term);
+          
+          return matchesName || matchesSubject || matchesDescription || 
+                 matchesPrice || matchesExperience || matchesRating;
+        });
 
-        if (!matchesName && !matchesSubject && !matchesDescription) {
+        if (!matchesAnyTerm) {
           return false;
         }
       }
@@ -264,9 +273,71 @@ export default function Dashboard() {
       description:
         "Evelyn teaches exam-oriented biology with diagrams and active recall. Great for secondary to pre-university levels.",
     },
+    {
+      id: 6,
+      name: "Frank Chen",
+      subject: "Python Programming",
+      experience: 8,
+      rating: 4.9,
+      price: 60,
+      description:
+        "Frank is a software engineer with expertise in Python, data science, and web development. Great for beginners to advanced learners.",
+    },
+    {
+      id: 7,
+      name: "Grace Kim",
+      subject: "Guitar",
+      experience: 6,
+      rating: 4.8,
+      price: 40,
+      description:
+        "Grace teaches acoustic and electric guitar for all skill levels. Specializes in rock, pop, and classical music styles.",
+    },
+    {
+      id: 8,
+      name: "Henry Zhang",
+      subject: "C++ Programming",
+      experience: 9,
+      rating: 4.7,
+      price: 65,
+      description:
+        "Henry is a senior software developer specializing in C++, algorithms, and competitive programming. Perfect for CS students.",
+    },
+    {
+      id: 9,
+      name: "Isabella Rodriguez",
+      subject: "Piano",
+      experience: 10,
+      rating: 4.9,
+      price: 50,
+      description:
+        "Isabella is a classically trained pianist with experience teaching children and adults. Focuses on technique and musicality.",
+    },
+    {
+      id: 10,
+      name: "James Wilson",
+      subject: "History",
+      experience: 5,
+      rating: 4.6,
+      price: 35,
+      description:
+        "James makes history engaging with storytelling and critical analysis. Specializes in world history and political science.",
+    },
   ]);
 
   const location = useLocation();
+
+  // Handle search query from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchQuery = urlParams.get('q');
+    if (searchQuery) {
+      setFilters(prev => ({
+        ...prev,
+        searchQuery: decodeURIComponent(searchQuery)
+      }));
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -378,8 +449,18 @@ export default function Dashboard() {
             <TutorRecommendation tutors={tutors} />
             <div id="tutors" className="tutors-panel">
               <h3>Find Your Tutor</h3>
+              {filters.searchQuery && (
+                <div className="search-results-header">
+                  <p>Search results for: <strong>"{filters.searchQuery}"</strong></p>
+                  <button 
+                    className="clear-search-btn"
+                    onClick={() => updateFilter("searchQuery", "")}
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              )}
 
-              {/* Filter Section */}
               <div className="tutor-filters">
                 <div className="filter-row">
                   <div className="filter-group">
@@ -408,6 +489,11 @@ export default function Dashboard() {
                       <option value="Chemistry">Chemistry</option>
                       <option value="English">English</option>
                       <option value="Biology">Biology</option>
+                      <option value="History">History</option>
+                      <option value="Python Programming">Python Programming</option>
+                      <option value="C++ Programming">C++ Programming</option>
+                      <option value="Guitar">Guitar</option>
+                      <option value="Piano">Piano</option>
                     </select>
                   </div>
                 </div>
@@ -653,6 +739,12 @@ export default function Dashboard() {
               </button>
               <button
                 className="action-btn secondary"
+                onClick={() => navigate("/tutor-assignments")}
+              >
+                📚 Manage Assignments
+              </button>
+              <button
+                className="action-btn secondary"
                 onClick={() => setSelectedAction("view_earnings")}
               >
                 📊 View Earnings
@@ -804,9 +896,7 @@ export default function Dashboard() {
                     "session"
                   );
 
-                  alert(
-                    `You have successfully joined ${selectedTutor.name}'s ${selectedTutor.subject} class! 🎉`
-                  );
+                  navigate(`/lesson?student=true&tutor=${encodeURIComponent(selectedTutor.name)}&subject=${encodeURIComponent(selectedTutor.subject)}`);
                   setSelectedTutor(null);
                 }}
               >

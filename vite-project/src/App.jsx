@@ -11,6 +11,8 @@ import ProfilePage from "./pages/ProfilePage";
 import AssignmentsPage from "./pages/AssignmentsPage";
 import FeedbackPage from "./pages/FeedbackPage";
 import CheckInPage from "./pages/CheckInPage";
+import RedeemedVouchersPage from "./pages/RedeemedVouchersPage";
+import TutorAssignmentsPage from "./pages/TutorAssignmentsPage";
 
 export default function App() {
   return (
@@ -28,6 +30,9 @@ export default function App() {
           <Route path="/assignments" element={<AssignmentsPage />} />
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/check-in" element={<CheckInPage />} />
+          <Route path="/redeemed" element={<RedeemedVouchersPage />} />
+          <Route path="/tutor-assignments" element={<TutorAssignmentsPage />} />
+          <Route path="/lesson" element={<LessonPage />} />
         </Routes>
       </>
   );

@@ -1,5 +1,6 @@
 import { useCoins } from "../context/CoinContext.jsx";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./RewardsPage.css";
 
 export default function RewardsPage() {
@@ -146,15 +147,27 @@ export default function RewardsPage() {
 
       {redeemed.length > 0 && (
         <div className="redeemed-section">
-          <h3>Redeemed Items</h3>
+          <div className="redeemed-header">
+            <h3>Redeemed Items</h3>
+            <Link to="/redeemed" className="view-all-btn">
+              View All Redeemed Items →
+            </Link>
+          </div>
           <ul className="redeemed-list">
-            {redeemed.map((r, i) => (
+            {redeemed.slice(0, 3).map((r, i) => (
               <li key={i} className="redeemed-item">
                 <span>{r.label}</span>
                 <span>{r.ts}</span>
               </li>
             ))}
           </ul>
+          {redeemed.length > 3 && (
+            <div className="view-more">
+              <Link to="/redeemed" className="view-more-btn">
+                View {redeemed.length - 3} more items →
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>

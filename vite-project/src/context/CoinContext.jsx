@@ -55,6 +55,8 @@ export function CoinProvider({ children }) {
           if (next >= 3) addStudentCoins(5); 
           return { ...s, dailyLogin: next };
         });
+        // Set the daily login date in localStorage for consistency
+        localStorage.setItem("last-daily-login", new Date().toDateString());
         break;
       case "weekly_streak_completed":
         addStudentCoins(30);

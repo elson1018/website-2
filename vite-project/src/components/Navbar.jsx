@@ -9,7 +9,14 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchSuggestions] = useState([
+    "Mathematics", "Physics", "Chemistry", "English", "Biology", "History",
+    "Python Programming", "C++ Programming", "Guitar", "Piano",
+    "Alice Tan", "Benjamin Lee", "Frank Chen", "Grace Kim"
+  ]);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -19,7 +26,6 @@ export default function Navbar() {
     } catch {}
   }, []);
 
-  // Re-check auth user on route changes and storage updates
   useEffect(() => {
     try {
       const raw = localStorage.getItem("auth-user");
@@ -44,6 +50,9 @@ export default function Navbar() {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setIsMenuOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
     };
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
@@ -56,15 +65,56 @@ export default function Navbar() {
     navigate("/");
     setIsMenuOpen(false);
   };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      navigate(`/dashboard?q=${encodeURIComponent(query.trim())}#tutors`);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setQuery(suggestion);
+    navigate(`/dashboard?q=${encodeURIComponent(suggestion)}#tutors`);
+    setShowSuggestions(false);
+  };
+
+  const filteredSuggestions = searchSuggestions.filter(suggestion =>
+    suggestion.toLowerCase().includes(query.toLowerCase())
+  );
   return (
     <nav className="navbar">
       <div className="logo">
         <Link to="/">NaiNaiLong</Link>
       </div>
 
-      <div className="search-container">
-        <form onSubmit={(e) => { e.preventDefault(); navigate(`/dashboard?q=${encodeURIComponent(query)}#tutors`); }}>
-          <input type="text" className="search-bar" placeholder="Search subject or tutor..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      <div className="search-container" ref={searchRef}>
+        <form onSubmit={handleSearchSubmit}>
+          <input 
+            type="text" 
+            className="search-bar" 
+            placeholder="Search subject or tutor..." 
+            value={query} 
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowSuggestions(e.target.value.length > 0);
+            }}
+            onFocus={() => setShowSuggestions(query.length > 0)}
+          />
+          {showSuggestions && filteredSuggestions.length > 0 && (
+            <div className="search-suggestions">
+              {filteredSuggestions.slice(0, 5).map((suggestion, index) => (
+                <div 
+                  key={index}
+                  className="suggestion-item"
+                  onClick={() => handleSuggestionClick(suggestion)}
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
         </form>
       </div>
 
@@ -99,7 +149,11 @@ export default function Navbar() {
               <div className="menu-dropdown" role="menu">
                 <Link to="/profile" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Profile</Link>
                 <button className="menu-item" role="menuitem" onClick={() => { setIsMenuOpen(false); navigate('/profile'); }}>Settings</button>
-                <Link to="/rewards" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Rewards</Link>
+                     <Link to="/rewards" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Rewards</Link>
+                     <Link to="/redeemed" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>My Redeemed Items</Link>
+                     {role === "tutor" && (
+                       <Link to="/tutor-assignments" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Manage Assignments</Link>
+                     )}
                 <div className="menu-sep" />
                 <button className="menu-item danger" role="menuitem" onClick={handleLogout}>Logout</button>
               </div>
