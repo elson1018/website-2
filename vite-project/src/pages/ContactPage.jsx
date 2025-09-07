@@ -25,7 +25,6 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setSubmitStatus("success");

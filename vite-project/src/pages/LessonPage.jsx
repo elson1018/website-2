@@ -11,7 +11,6 @@ export default function LessonPage({ onFinish, tutor, subject }) {
   const [isStudentView, setIsStudentView] = useState(false);
 
   useEffect(() => {
-    // Check if this is a student joining a lesson
     const urlParams = new URLSearchParams(window.location.search);
     const studentView = urlParams.get('student') === 'true';
     setIsStudentView(studentView);

@@ -10,7 +10,7 @@ export default function AboutPage() {
     bio: "Driven by a passion for education, he leads NaiNaiLong with the vision of making quality learning accessible to everyone."
   },
   {
-    name: "Elson Ooi",
+    name: "Elson Ooi Yin Feng",
     role: "Co-Founder & Tech Lead",
     avatar: "👨‍💻",
     bio: "The backbone of our platform — Elson designs and builds the technology that connects students with the right tutors."

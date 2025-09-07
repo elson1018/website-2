@@ -45,13 +45,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Get stored users from localStorage
       const users = JSON.parse(localStorage.getItem("users") || "[]");
 
-      // Check if user exists
       const user = users.find(u => u.email === formData.email && u.password === formData.password);
 
       if (!user) {
@@ -59,10 +56,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Save logged-in user
       localStorage.setItem("auth-user", JSON.stringify(user));
 
-      // Redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);

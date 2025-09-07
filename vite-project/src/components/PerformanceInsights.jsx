@@ -35,7 +35,7 @@ export default function PerformanceInsights({ sessions, currentUser }) {
     for (let i = 5; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-      const monthKey = date.toISOString().slice(0, 7); // YYYY-MM
+      const monthKey = date.toISOString().slice(0, 7);
       
       const monthSessions = tutorSessions.filter(s => 
         s.date.startsWith(monthKey)
@@ -56,7 +56,7 @@ export default function PerformanceInsights({ sessions, currentUser }) {
     setInsights({
       total: tutorSessions.length,
       feedback: feedbackCount,
-      averageRating: feedbackCount > 0 ? 4.7 : 0, // Mock average rating
+      averageRating: feedbackCount > 0 ? 4.7 : 0,
       students: uniqueStudents,
       subjectStats,
       monthlyStats,

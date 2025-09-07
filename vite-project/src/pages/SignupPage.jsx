@@ -78,13 +78,10 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Get existing users
       const users = JSON.parse(localStorage.getItem("users") || "[]");
 
-      // Check if email already exists
       if (users.some(u => u.email === formData.email)) {
         setErrors({ email: "An account with this email already exists" });
         return;
@@ -97,21 +94,16 @@ export default function SignupPage() {
         role: formData.role
       };
 
-      // Save user in localStorage
       users.push(newUser);
       localStorage.setItem("users", JSON.stringify(users));
 
-      // Set role in context
       setRole(formData.role);
 
-      // Optionally, add initial coins
       if (formData.role === "student") addStudentCoins(100);
       else addTutorCoins(150);
 
-      // Set logged-in user
       localStorage.setItem("auth-user", JSON.stringify(newUser));
 
-      // Navigate to dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error);

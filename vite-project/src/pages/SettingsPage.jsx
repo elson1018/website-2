@@ -24,7 +24,6 @@ export default function SettingsPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Save to localStorage or backend
     localStorage.setItem(
       "auth-user",
       JSON.stringify({ ...currentUser, ...formData })
@@ -37,7 +36,6 @@ export default function SettingsPage() {
       <h2>⚙️ Settings</h2>
       <form onSubmit={handleSubmit} className="settings-form">
 
-        {/* Profile Info */}
         <div className="settings-section">
           <h3>👤 Profile</h3>
           <label>
@@ -72,7 +70,6 @@ export default function SettingsPage() {
           </label>
         </div>
 
-        {/* Preferences */}
         <div className="settings-section">
           <h3>🌐 Preferences</h3>
           <label>
@@ -94,7 +91,6 @@ export default function SettingsPage() {
           </label>
         </div>
 
-        {/* Notifications */}
         <div className="settings-section">
           <h3>🔔 Notifications</h3>
           <label className="checkbox">
@@ -108,7 +104,6 @@ export default function SettingsPage() {
           </label>
         </div>
 
-        {/* Save Button */}
         <button type="submit" className="save-btn">Save Changes</button>
       </form>
     </div>

@@ -20,7 +20,6 @@ export default function RewardsPage() {
     setRedeemed(raw ? JSON.parse(raw) : []);
   }, []);
 
-  // Handle check-in
   const handleCheckIn = () => {
   const today = new Date().toDateString();
   const lastLogin = localStorage.getItem("last-daily-login");
@@ -38,7 +37,6 @@ export default function RewardsPage() {
   alert("🎉 Checked in! Coins awarded.");
 };
 
-  // Handle redeem
   const handleRedeem = (amount, label) => {
     if (role === "student" && studentCoins >= amount) {
       spendStudentCoins(amount);
@@ -55,7 +53,6 @@ export default function RewardsPage() {
     alert(`🎉 Successfully redeemed ${label}!`);
   };
 
-  // Get coins for current role
   const coins = role === "student" ? studentCoins : tutorCoins;
 
   return (
@@ -83,7 +80,6 @@ export default function RewardsPage() {
           {hasCheckedIn ? "✅ Checked In" : "Check In"}
         </button>
 
-        {/* Streak bar */}
         <div className="streak-container">
           <span>Daily Login Streak:</span>
           <div className="streak-bar">

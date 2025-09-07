@@ -93,7 +93,6 @@ export default function Dashboard() {
 
   const getFilteredTutors = () => {
     return tutors.filter((tutor) => {
-      // Subject filter
       if (
         filters.subject &&
         tutor.subject.toLowerCase() !== filters.subject.toLowerCase()
@@ -101,7 +100,6 @@ export default function Dashboard() {
         return false;
       }
 
-      // Price range filter
       if (
         tutor.price < filters.priceRange.min ||
         tutor.price > filters.priceRange.max
@@ -109,7 +107,6 @@ export default function Dashboard() {
         return false;
       }
 
-      // Experience filter
       if (
         tutor.experience < filters.experience.min ||
         tutor.experience > filters.experience.max
@@ -117,7 +114,6 @@ export default function Dashboard() {
         return false;
       }
 
-      // Rating filter
       if (
         tutor.rating < filters.rating.min ||
         tutor.rating > filters.rating.max
@@ -125,12 +121,10 @@ export default function Dashboard() {
         return false;
       }
 
-      // Search query filter
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase().trim();
         const searchTerms = query.split(' ').filter(term => term.length > 0);
         
-        // Check if any search term matches any field
         const matchesAnyTerm = searchTerms.some(term => {
           const matchesName = tutor.name.toLowerCase().includes(term);
           const matchesSubject = tutor.subject.toLowerCase().includes(term);
@@ -184,9 +178,9 @@ export default function Dashboard() {
     }
 
     localStorage.setItem("last-daily-login", today);
-    setHasLoggedInToday(true); // disable button
+    setHasLoggedInToday(true);
 
-    simulateStudentAction("daily_login"); // updates coins + streaks
+    simulateStudentAction("daily_login");
 
     addActivity("Checked in for daily login", "user");
 
@@ -327,7 +321,6 @@ export default function Dashboard() {
 
   const location = useLocation();
 
-  // Handle search query from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchQuery = urlParams.get('q');
@@ -342,10 +335,10 @@ export default function Dashboard() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setStats({
-        users: 1247, // total users on platform
-        tutors: 320, // number of tutors
-        sessions: 156, // tutoring sessions this month
-        satisfaction: 95, // satisfaction rate
+        users: 1247,
+        tutors: 320,
+        sessions: 156, 
+        satisfaction: 95,
       });
 
       setIsLoading(false);
