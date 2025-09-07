@@ -16,10 +16,8 @@ export default function PerformanceInsights({ sessions, currentUser }) {
     const tutorSessions = sessions.filter(s => s.tutor === currentUser?.fullName);
     const feedbackCount = tutorSessions.filter(s => s.feedback).length;
     
-    // Get unique students
     const uniqueStudents = [...new Set(tutorSessions.map(s => s.student))];
     
-    // Calculate subject statistics
     const subjectStats = {};
     tutorSessions.forEach(session => {
       if (!subjectStats[session.subject]) {
@@ -29,12 +27,10 @@ export default function PerformanceInsights({ sessions, currentUser }) {
       subjectStats[session.subject].students.add(session.student);
     });
     
-    // Convert Set to count for each subject
     Object.keys(subjectStats).forEach(subject => {
       subjectStats[subject].students = subjectStats[subject].students.size;
     });
     
-    // Calculate monthly stats (last 6 months)
     const monthlyStats = [];
     for (let i = 5; i >= 0; i--) {
       const date = new Date();
@@ -52,7 +48,6 @@ export default function PerformanceInsights({ sessions, currentUser }) {
       });
     }
     
-    // Get recent feedback
     const recentFeedback = tutorSessions
       .filter(s => s.feedback)
       .sort((a, b) => new Date(b.date) - new Date(a.date))

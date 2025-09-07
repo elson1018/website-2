@@ -56,7 +56,7 @@ export default function AssignmentsPage() {
       estimatedTime: "25 minutes",
       coins: 18,
       questions: [
-        { id: 1, question: "What is the correct way to create a list in Python?", options: ["list = []", "list = {}", "list = ()", "list = []"], correct: 0 },
+        { id: 1, question: "What is the correct way to create a list in Python?", options: ["list = []", "list = {}", "list = ()"], correct: 0 },
         { id: 2, question: "Which keyword is used to define a function in Python?", options: ["def", "function", "define", "func"], correct: 0 },
         { id: 3, question: "What will print(2 + 3 * 4) output?", options: ["20", "14", "24", "Error"], correct: 1 }
       ]

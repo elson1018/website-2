@@ -700,7 +700,7 @@ export default function Dashboard() {
               </button>
               <button
                 className="action-btn secondary"
-                onClick={() => setSelectedAction("assignments")}
+                onClick={() => navigate("/assignments")}
               >
                 📚 View Assignments
               </button>
@@ -778,7 +778,7 @@ export default function Dashboard() {
 
               <button
                 className="action-btn secondary"
-                onClick={() => setSelectedAction("assignments")}
+                onClick={() => navigate("/assignments")}
               >
                 📚 Complete Assignments
               </button>

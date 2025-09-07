@@ -13,6 +13,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import CheckInPage from "./pages/CheckInPage";
 import RedeemedVouchersPage from "./pages/RedeemedVouchersPage";
 import TutorAssignmentsPage from "./pages/TutorAssignmentsPage";
+import LessonPage from "./pages/LessonPage";
 
 export default function App() {
   return (
