@@ -149,11 +149,11 @@ export default function Navbar() {
               <div className="menu-dropdown" role="menu">
                 <Link to="/profile" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Profile</Link>
                 <Link to="/settings" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Settings</Link>
-                     <Link to="/rewards" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Rewards</Link>
-                     <Link to="/redeemed" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>My Redeemed Items</Link>
-                     {role === "tutor" && (
-                       <Link to="/tutor-assignments" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Manage Assignments</Link>
-                     )}
+                <Link to="/rewards" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Rewards</Link>
+                <Link to="/redeemed" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>My Redeemed Items</Link>
+                {role === "tutor" && (
+                  <Link to="/tutor-assignments" className="menu-item" role="menuitem" onClick={() => setIsMenuOpen(false)}>Manage Assignments</Link>
+                )}
                 <div className="menu-sep" />
                 <button className="menu-item danger" role="menuitem" onClick={handleLogout}>Logout</button>
               </div>
